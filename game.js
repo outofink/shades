@@ -25,6 +25,8 @@
         //console.log(this.bodies)
         this.wrongSound = document.getElementById('wrong-sound');
         this.correctSound = document.getElementById('correct-sound');
+        this.wrongSound.load()
+        this.correctSound.load()
         this.fired = false;
         this.points = 0;
         this.playsound = 0;
@@ -50,7 +52,8 @@
             var canvas = document.getElementById("screen");
         },
         draw: function(screen) {
-            screen.clearRect(0, 0, this.size.x, this.size.y);
+            screen.fillStyle="white"
+            screen.fillRect(0, 0, this.size.x, this.size.y);
             for (var i = 0; i < this.bodies.length; i++) {
                 if (this.bodies[i].draw !== undefined) {
                     this.bodies[i].draw(screen);
@@ -74,6 +77,29 @@
             }
         }
     };
+    var Timer = function() {
+        this.startTime = 0;
+        this.current = 0;
+        this.paused = false
+
+    };
+    Timer.prototype = {
+        start: function() {
+            this.paused = false
+            this.startTime = Date.now() - this.current
+        },
+        getTime: function() {
+            return this.paused ? this.current/1000 : (Date.now()-this.startTime)/1000
+        },
+        reset: function() {
+            this.paused = false
+            this.startTime = Date.now()
+        },
+        pause: function() {
+            this.paused = true
+            this.current = (Date.now()-this.startTime)
+        }
+    };
     var Square = function(game, center, size, color) {
         this.game = game;
         this.center = center;
@@ -91,12 +117,14 @@
                 this.game.points += 1;
                 this.game.playsound = 1;
                 //this.game.correctSound.load();
-                //this.game.correctSound.play();
+                game.correctSound.currentTime=0;
+                this.game.correctSound.play();
             } else {
                 this.game.points = 0;
                 this.game.playsound = -1;
                 //this.game.wrongSound.load();
-                //this.game.wrongSound.play();
+                game.wrongSound.currentTime=0;
+                this.game.wrongSound.play();
             }
             this.game.bodies = createSquares(this.game).concat(this.game.steve);
         }
@@ -113,7 +141,9 @@
         } else {
             count = 20;
         }
-        colorOffset = Math.ceil(200 * Math.pow(1 + (-0.5 / 10), 10 * (game.points / 10)));
+        startingOffset=150;
+        difficultySpeed = 0.4;
+        colorOffset = Math.ceil(startingOffset * Math.pow(1 + (-difficultySpeed / 10), 10 * (game.points / 10)));
         console.log(colorOffset);
         chosen = Math.floor(Math.random() * count + 1);
         color = {
@@ -126,8 +156,8 @@
         hexOtherColor = rgbToHex(otherColor.r, otherColor.g, otherColor.b);
         //console.log(hexColor, hexOtherColor, chosen);
         grid = getGrid(count);
-        sizex = (game.size.x - ((grid.columns - 1) * game.size.x * 0.02) - (game.size.x * 0.2)) / grid.columns;
-        sizey = (game.size.y - ((grid.rows - 1) * game.size.x * 0.02) - (game.size.y * 0.3)) / grid.rows;
+        sizex = (game.size.x - ((grid.columns - 1) * game.size.x * 0.02) - (game.size.x * 0.15)) / grid.columns;
+        sizey = (game.size.y - ((grid.rows - 1) * game.size.x * 0.02) - (game.size.y * 0.25)) / grid.rows;
         size = Math.min(sizex, sizey, game.size.x * 0.2, game.size.y * 0.2);
         bufferx = (game.size.x - (grid.columns * (size + game.size.x * 0.02))) / 2;
         buffery = (game.size.y - (grid.rows * (size + game.size.y * 0.02))) / 2;
@@ -203,15 +233,15 @@
             x: this.game.size.x / 2,
             y: this.game.size.y - 35
         };
-        this.keyboarder = new Keyboarder(this.game);
+        this.input = new Input(this.game);
     };
     Player.prototype = {
         update: function() {
-            if (this.keyboarder.isTouching()) {
-                //console.log(this.keyboarder.touchlocX())
+            if (this.input.isTouching()) {
+                //console.log(this.input.touchlocX())
                 var touch = new Touch(this.game, {
-                    x: this.keyboarder.touchlocX(),
-                    y: this.keyboarder.touchlocY()
+                    x: this.input.touchlocX(),
+                    y: this.input.touchlocY()
                 }, {
                     x: 0,
                     y: 0
@@ -221,7 +251,7 @@
                     this.game.fired = true;
                 }
             }
-            if (!this.keyboarder.isTouching()) {
+            if (!this.input.isTouching()) {
                 this.game.fired = false;
             }
             if (this.game.points > this.game.best) {
@@ -260,7 +290,7 @@
             this.game.removeBody(this);
         }
     };
-    var Keyboarder = function(game) {
+    var Input = function(game) {
         var touching;
         var touchloc = {
             x: 0,
@@ -278,22 +308,22 @@
         });
         window.addEventListener('touchend', function(e) {
             touching = false;
-            if (game.playsound == 1) {
-        //game.correctSound.load();
-        // if (game.fired) {
-          game.correctSound.currentTime=0;
-          game.correctSound.play();
-          game.playsound=0;
-        // }
-      }
-      else if (game.playsound == -1) {
-        //this.game.wrongSound.load();
-        // if (game.fired) {
-          game.wrongSound.currentTime=0;
-          game.wrongSound.play();
-          game.playsound=0;
-       // }
-        }
+      //       if (game.playsound == 1) {
+      //   //game.correctSound.load();
+      //   // if (game.fired) {
+      //     game.correctSound.currentTime=0;
+      //     game.correctSound.play();
+      //     game.playsound=0;
+      //   // }
+      // }
+      // else if (game.playsound == -1) {
+      //   //this.game.wrongSound.load();
+      //   // if (game.fired) {
+      //     game.wrongSound.currentTime=0;
+      //     game.wrongSound.play();
+      //     game.playsound=0;
+      //  // }
+      //   }
         });
         this.isTouching = function() {
             return touching === true;
