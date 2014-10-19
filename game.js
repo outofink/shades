@@ -1,5 +1,7 @@
 ;(function() {
     var Game = function() {
+        DEBUG = false
+        this.gameObjects = [];
         var canvas = document.getElementById("screen");
         var screen = canvas.getContext("2d");
         var W = window.innerWidth;
@@ -18,21 +20,19 @@
             x: screen.canvas.width,
             y: screen.canvas.height
         };
-        this.size2 = {
-            x: screen.canvas.width,
-            y: screen.canvas.height
-        };
-        //console.log(this.bodies)
         this.wrongSound = document.getElementById('wrong-sound');
         this.correctSound = document.getElementById('correct-sound');
         this.wrongSound.load()
         this.correctSound.load()
         this.fired = false;
-        this.points = 0;
-        this.playsound = 0;
-        this.best = localStorage.getItem('best') || 0;
-        this.steve = new Player(this);
-        this.bodies = createSquares(this).concat(this.steve);
+        this.player = new Player(this);
+        this.gameObjects.push(this.player)
+        if (DEBUG) {
+            this.timer = new Countdown(this, 30, true)
+            this.gameObjects.push(this.timer)
+            this.timer.start();
+        }
+        this.bodies = createSquares(this).concat(this.gameObjects);
         var self = this;
         var tick = function() {
             self.update();
@@ -52,7 +52,7 @@
             var canvas = document.getElementById("screen");
         },
         draw: function(screen) {
-            screen.fillStyle="white"
+            screen.fillStyle = "white"
             screen.fillRect(0, 0, this.size.x, this.size.y);
             for (var i = 0; i < this.bodies.length; i++) {
                 if (this.bodies[i].draw !== undefined) {
@@ -60,13 +60,21 @@
                 }
             }
         },
-        // squaresBelow: function(square) {
-        //   return this.bodies.filter(function(b) {
-        //     return b instanceof Square &&
-        //       Math.abs(square.center.x - b.center.x) < b.size.x &&
-        //       b.center.y > square.center.y;
-        //   }).length > 0;
-        // },
+        choice: function(correct) {
+            if (correct) {
+                this.player.score += 1;
+                this.correctSound.currentTime = 0;
+                this.correctSound.play();
+                if (this.timer !== undefined) this.timer.newRound(false)
+            } 
+            else {
+                this.player.score = 0;
+                this.wrongSound.currentTime = 0;
+                this.wrongSound.play();
+                if (this.timer !== undefined) this.timer.newRound(true)
+            }
+            this.bodies = createSquares(this).concat(this.gameObjects);
+        },
         addBody: function(body) {
             this.bodies.push(body);
         },
@@ -77,27 +85,49 @@
             }
         }
     };
-    var Timer = function() {
+    var Countdown = function(game, seconds, permanent, paused) {
+        this.game = game;
+        this.size = {x: 0, y: 0};
+        this.center = {x: 0, y: 0};
         this.startTime = 0;
         this.current = 0;
-        this.paused = false
+        this.paused = paused || false;
+        this.seconds = (seconds) * 1000;
+        this.permanent = permanent;
 
     };
-    Timer.prototype = {
+    Countdown.prototype = {
         start: function() {
             this.paused = false
-            this.startTime = Date.now() - this.current
+            this.startTime = Date.now() - this.current + this.seconds
         },
         getTime: function() {
-            return this.paused ? this.current/1000 : (Date.now()-this.startTime)/1000
+            if (this.startTime - Date.now() <= 0) return 0
+
+            return this.paused ? this.current / 1000 : (this.startTime - Date.now()) / 1000
         },
         reset: function() {
             this.paused = false
-            this.startTime = Date.now()
+            this.startTime = Date.now() + this.seconds
         },
         pause: function() {
             this.paused = true
-            this.current = (Date.now()-this.startTime)
+            this.current = (this.startTime - Date.now())
+        },
+        newRound: function(wrong) {
+            if (!this.permanent || wrong) {
+                this.start()
+            }
+        },
+        isZero: function() {
+            return this.getTime() == 0 ? true : false;
+        },
+        draw: function(screen) {
+            screen.textAlign = "right";
+            screen.font = scoresize + "px Arial"; //  768/12  height/12
+            screen.fillText(Math.floor(this.game.timer.getTime()), screen.canvas.width - scoresize / 4, scoresize);
+            screen.font = bestsize + "px Arial"; //  768/12  height/12
+            screen.fillText(this.game.timer.getTime().toFixed(3).toString().replace(/^[^\.]+/, ''), screen.canvas.width - scoresize / 4, scoresize * (3 / 2));
         }
     };
     var Square = function(game, center, size, color) {
@@ -108,42 +138,26 @@
         this.correct = correct;
     };
     Square.prototype = {
-        update: function() {},
         draw: function(screen) {
             drawRect(screen, this, this.color);
         },
         collision: function() {
-            if (this.correct) {
-                this.game.points += 1;
-                this.game.playsound = 1;
-                //this.game.correctSound.load();
-                game.correctSound.currentTime=0;
-                this.game.correctSound.play();
-            } else {
-                this.game.points = 0;
-                this.game.playsound = -1;
-                //this.game.wrongSound.load();
-                game.wrongSound.currentTime=0;
-                this.game.wrongSound.play();
-            }
-            this.game.bodies = createSquares(this.game).concat(this.game.steve);
+            if (this.correct) this.game.choice(true)
+            else this.game.choice(false)
         }
     };
     var createSquares = function(game) {
-        //console.log(game);
         var squares = [];
-        //console.log(game.points);
-        if (game.points < 10) {
-            count = game.points + 3;
+        if (game.player.score < 10) {
+            count = game.player.score + 3;
             if (count == 13 || count == 11) {
                 count += 1;
             }
-        } else {
-            count = 20;
-        }
-        startingOffset=150;
+        } 
+        else count = 20;
+        startingOffset = 150;
         difficultySpeed = 0.4;
-        colorOffset = Math.ceil(startingOffset * Math.pow(1 + (-difficultySpeed / 10), 10 * (game.points / 10)));
+        colorOffset = Math.ceil(startingOffset * Math.pow(1 + (-difficultySpeed / 10), 10 * (game.player.score / 10)));
         console.log(colorOffset);
         chosen = Math.floor(Math.random() * count + 1);
         color = {
@@ -167,11 +181,12 @@
             if (i == chosen) {
                 chosenColor = hexOtherColor;
                 correct = true;
-            } else {
+            }
+else {
                 chosenColor = hexColor;
                 correct = false;
             }
-            squares.push(new Square(game, {x: x, y: y}, {x: size, y: size }, chosenColor, correct));
+            squares.push(new Square(game, {x: x, y: y}, {x: size, y: size}, chosenColor, correct));
         }
         return squares;
     };
@@ -193,11 +208,14 @@
         };
         if (otherColor.r < 0 || otherColor.r > 255) {
             return getOtherColor(color, colorOffset);
-        } else if (otherColor.g < 0 || otherColor.g > 255) {
+        }
+        else if (otherColor.g < 0 || otherColor.g > 255) {
             return getOtherColor(color, colorOffset);
-        } else if (otherColor.b < 0 || otherColor.b > 255) {
+        } 
+        else if (otherColor.b < 0 || otherColor.b > 255) {
             return getOtherColor(color, colorOffset);
-        } else {
+        } 
+        else {
             return otherColor;
         }
     };
@@ -208,13 +226,16 @@
         if (count % 4 === 0 && count / 4 > 1) {
             k = 4;
             j = count / 4;
-        } else if (count % 3 === 0 && count / 3 > 1) {
+        } 
+        else if (count % 3 === 0 && count / 3 > 1) {
             k = 3;
             j = count / 3;
-        } else if (count % 2 === 0 && count / 2 > 1) {
+        } 
+        else if (count % 2 === 0 && count / 2 > 1) {
             k = 2;
             j = count / 2;
-        } else if (count < 10) {
+        } 
+        else if (count < 10) {
             k = 1;
             j = count;
         }
@@ -233,6 +254,8 @@
             x: this.game.size.x / 2,
             y: this.game.size.y - 35
         };
+        this.score = 0;
+        this.best = localStorage.getItem('best') || 0;
         this.input = new Input(this.game);
     };
     Player.prototype = {
@@ -254,23 +277,24 @@
             if (!this.input.isTouching()) {
                 this.game.fired = false;
             }
-            if (this.game.points > this.game.best) {
-                this.game.best = this.game.points;
-                localStorage.setItem('best', this.game.best);
+            if (this.score > this.best) {
+                this.best = this.score;
+                localStorage.setItem('best', this.best);
+            }
+            if (this.game.timer !== undefined && this.game.timer.isZero()) {
+                this.game.choice(false);
             }
         },
         draw: function(screen) {
             //drawRect(screen, this);
+            screen.textAlign = "left";
             scoresize = screen.canvas.height / 10;
             bestsize = (scoresize * 3) / 8;
             screen.fillStyle = "black";
             screen.font = scoresize + "px Arial"; //  768/12  height/12
-            screen.fillText(this.game.points, scoresize / 4, scoresize);
+            screen.fillText(this.game.player.score, scoresize / 4, scoresize);
             screen.font = bestsize + "px Arial";
-            screen.fillText("Best: " + this.game.best, scoresize / 4, scoresize + bestsize * (5 / 4));
-        },
-        collision: function() {
-            //this.game.removeBody(this);
+            screen.fillText("Best: " + this.game.player.best, scoresize / 4, scoresize + bestsize * (5 / 4));
         }
     };
     var Touch = function(game, center, velocity) {
@@ -282,7 +306,6 @@
         };
     };
     Touch.prototype = {
-        update: function() {},
         draw: function(screen) {
             drawRect(screen, this, "transparent");
         },
@@ -292,10 +315,7 @@
     };
     var Input = function(game) {
         var touching;
-        var touchloc = {
-            x: 0,
-            y: 0
-        };
+        var touchloc = {x: 0, y: 0};
         window.addEventListener('touchstart', function(e) {
             e.preventDefault();
             touching = true;
@@ -303,27 +323,9 @@
                 x: e.touches[0].pageX * window.devicePixelRatio,
                 y: e.touches[0].pageY * window.devicePixelRatio
             };
-
-            //console.log(touchloc.x)
         });
         window.addEventListener('touchend', function(e) {
             touching = false;
-      //       if (game.playsound == 1) {
-      //   //game.correctSound.load();
-      //   // if (game.fired) {
-      //     game.correctSound.currentTime=0;
-      //     game.correctSound.play();
-      //     game.playsound=0;
-      //   // }
-      // }
-      // else if (game.playsound == -1) {
-      //   //this.game.wrongSound.load();
-      //   // if (game.fired) {
-      //     game.wrongSound.currentTime=0;
-      //     game.wrongSound.play();
-      //     game.playsound=0;
-      //  // }
-      //   }
         });
         this.isTouching = function() {
             return touching === true;
@@ -342,10 +344,10 @@
     };
     var isColliding = function(b1, b2) {
         return !(b1 === b2 ||
-                 b1.center.x + b1.size.x / 2 <= b2.center.x - b2.size.x / 2 ||
-                 b1.center.y + b1.size.y / 2 <= b2.center.y - b2.size.y / 2 ||
-                 b1.center.x - b1.size.x / 2 >= b2.center.x + b2.size.x / 2 ||
-                 b1.center.y - b1.size.y / 2 >= b2.center.y + b2.size.y / 2);
+            b1.center.x + b1.size.x / 2 <= b2.center.x - b2.size.x / 2 ||
+            b1.center.y + b1.size.y / 2 <= b2.center.y - b2.size.y / 2 ||
+            b1.center.x - b1.size.x / 2 >= b2.center.x + b2.size.x / 2 ||
+            b1.center.y - b1.size.y / 2 >= b2.center.y + b2.size.y / 2);
     };
     var reportCollisions = function(bodies) {
         var bodyPairs = [];
