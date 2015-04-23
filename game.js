@@ -2,41 +2,40 @@
     var Game = function() {
         DEBUG = false
         this.gameObjects = [];
+        this.isGameOver = false;
+        this.textTimer = new Timer(1)
+        this.fadeTimer = new Timer(1);
         var canvas = document.getElementById("screen");
-        var screen = canvas.getContext("2d");
+        this.display = canvas.getContext("2d");
         var W = window.innerWidth;
         var H = window.innerHeight;
         canvas.width = W;
         canvas.height = H;
         console.log(window.devicePixelRatio)
         if (window.devicePixelRatio > 1) {
-            screen.scale(window.devicePixelRatio, window.devicePixelRatio);
+            this.display.scale(window.devicePixelRatio, window.devicePixelRatio);
             canvas.width *= window.devicePixelRatio;
             canvas.height *= window.devicePixelRatio;
             canvas.style.width = W + "px";
             canvas.style.height = H + "px";
         }
         this.size = {
-            x: screen.canvas.width,
-            y: screen.canvas.height
+            x: this.display.canvas.width,
+            y: this.display.canvas.height
         };
-        this.wrongSound = document.getElementById('wrong-sound');
-        this.correctSound = document.getElementById('correct-sound');
-        this.wrongSound.load()
-        this.correctSound.load()
         this.fired = false;
-        this.player = new Player(this);
-        this.gameObjects.push(this.player)
         if (DEBUG) {
-            this.timer = new Countdown(this, 30, true)
+            this.timer = new Countdown(this, 5, false)
             this.gameObjects.push(this.timer)
             this.timer.start();
         }
+        this.player = new Player(this);
+        this.gameObjects.push(this.player)
         this.bodies = createSquares(this).concat(this.gameObjects);
         var self = this;
         var tick = function() {
             self.update();
-            self.draw(screen);
+            self.draw(self.display);
             requestAnimationFrame(tick);
         };
         tick();
@@ -49,31 +48,34 @@
                     this.bodies[i].update();
                 }
             }
-            var canvas = document.getElementById("screen");
         },
-        draw: function(screen) {
-            screen.fillStyle = "white"
-            screen.fillRect(0, 0, this.size.x, this.size.y);
+        draw: function(display) {
+            display.fillStyle = "white"
+            display.fillRect(0, 0, this.size.x, this.size.y);
             for (var i = 0; i < this.bodies.length; i++) {
                 if (this.bodies[i].draw !== undefined) {
-                    this.bodies[i].draw(screen);
+                    this.bodies[i].draw(display);
                 }
             }
+            //if (this.isGameOver) this.gameOver(display)
         },
-        choice: function(correct) {
-            if (correct) {
-                this.player.score += 1;
-                this.correctSound.currentTime = 0;
-                this.correctSound.play();
-                if (this.timer !== undefined) this.timer.newRound(false)
-            } 
-            else {
-                this.player.score = 0;
-                this.wrongSound.currentTime = 0;
-                this.wrongSound.play();
-                if (this.timer !== undefined) this.timer.newRound(true)
+        picked: function(correct) {
+            if (!this.isGameOver) {
+                if (correct) {
+                    this.player.score += 1;
+                    this.bodies = createSquares(this).concat(this.gameObjects);
+                    //if (this.timer !== undefined) this.timer.newRound(false)
+                } 
+                else {
+                    this.player.score = 0;
+                    //this.isGameOver = true;
+                    //if (this.timer !== undefined) this.timer.pause()
+                    //this.fadeTimer.start()
+                    //if (this.timer !== undefined) this.timer.newRound(true)
+                    this.bodies = createSquares(this).concat(this.gameObjects);
+                }
+                //this.bodies = createSquares(this).concat(this.gameObjects);
             }
-            this.bodies = createSquares(this).concat(this.gameObjects);
         },
         addBody: function(body) {
             this.bodies.push(body);
@@ -83,27 +85,56 @@
             if (bodyIndex !== -1) {
                 this.bodies.splice(bodyIndex, 1);
             }
+        },
+        gameOver: function(display) {
+            squares = this.bodies.filter(function(body) {
+                return body instanceof Square;
+            });
+            //console.log(squares)
+            for (i=0; i < squares.length; i++) {
+                if (!squares[i].correct) {
+                    squares[i].color=fadeColor(squares[i].originalColor,(this.fadeTimer.getTime()/this.fadeTimer.getStopPoint())*.8);
+                    //console.log((this.fadeTimer.getTime()/this.fadeTimer.getStopPoint())*.8)
+                    
+                }
+            }
+            if (this.fadeTimer.getTime() >= 1 && !this.fadeTimer.complete) {
+                this.textTimer.start()
+                //console.log(this.textTimer.getTime())
+                this.fadeTimer.complete = true;
+            }
+            //console.log(this.textTimer.getTime())
+            display.textAlign = "center";
+            display.font = this.size.x/10 + "px Helvetica"; //  768/12  height/12
+            display.fillStyle = "rgba(0,0,0,"+this.textTimer.getTime()/this.textTimer.getStopPoint()+")"
+            display.fillText("GAME OVER",this.display.canvas.width/2, this.display.canvas.height*(1/4));
+            for (i=0; i < squares.length; i++) {
+                if (squares[i].correct) {
+                    squares[i].color=fadeColor(squares[i].originalColor,(this.textTimer.getTime()/this.textTimer.getStopPoint())*.8);
+                }
+            }
         }
     };
     var Countdown = function(game, seconds, permanent, paused) {
         this.game = game;
-        this.size = {x: 0, y: 0};
-        this.center = {x: 0, y: 0};
+        this.size = {x: 1, y: 1};
+        this.center = {x: 1, y: 1};
         this.startTime = 0;
         this.current = 0;
         this.paused = paused || false;
         this.seconds = (seconds) * 1000;
         this.permanent = permanent;
+        this.finished = false;
 
     };
     Countdown.prototype = {
         start: function() {
             this.paused = false
             this.startTime = Date.now() - this.current + this.seconds
+            return true
         },
         getTime: function() {
-            if (this.startTime - Date.now() <= 0) return 0
-
+            if (this.startTime - Date.now() <= 0 && !this.paused) return 0
             return this.paused ? this.current / 1000 : (this.startTime - Date.now()) / 1000
         },
         reset: function() {
@@ -122,12 +153,69 @@
         isZero: function() {
             return this.getTime() == 0 ? true : false;
         },
-        draw: function(screen) {
-            screen.textAlign = "right";
-            screen.font = scoresize + "px Arial"; //  768/12  height/12
-            screen.fillText(Math.floor(this.game.timer.getTime()), screen.canvas.width - scoresize / 4, scoresize);
-            screen.font = bestsize + "px Arial"; //  768/12  height/12
-            screen.fillText(this.game.timer.getTime().toFixed(3).toString().replace(/^[^\.]+/, ''), screen.canvas.width - scoresize / 4, scoresize * (3 / 2));
+        draw: function(display) {
+            scoresize = display.canvas.height / 12;
+            bestsize = (scoresize * 3) / 8;
+            display.textAlign = "right";
+            display.font = scoresize + "px Helvetica"; //  768/12  height/12
+            display.fillText(Math.floor(this.getTime()), display.canvas.width - scoresize / 4, scoresize);
+            display.font = bestsize + "px Helvetica"; //  768/12  height/12
+            display.fillText(this.getTime().toFixed(3).toString().replace(/^[^\.]+/, ''), display.canvas.width - scoresize / 4, scoresize * (3 / 2));
+        }
+    };
+    function fadeColor(hex, percent){
+    // strip the leading # if it's there
+    hex = hex.replace(/^\s*#|\s*$/g, '');
+    var r = parseInt(hex.substr(0, 2), 16),
+        g = parseInt(hex.substr(2, 2), 16),
+        b = parseInt(hex.substr(4, 2), 16);
+
+    return '#' +
+       ((0|(1<<8) + r + (256 - r) * percent).toString(16)).substr(1) +
+       ((0|(1<<8) + g + (256 - g) * percent).toString(16)).substr(1) +
+       ((0|(1<<8) + b + (256 - b) * percent).toString(16)).substr(1);
+    }
+    var pass = function() {};
+    var Timer = function(stopPoint) {
+        this.startTime = Date.now()
+        this.paused = true
+        this.current = 0
+        this.stopPoint = stopPoint*1000;
+        this.complete=false;
+        // this.finishedFunction = finishedFunction;
+        //this.ranFunction = false
+    };
+    Timer.prototype = {
+        start: function() {
+            if (this.paused) {
+                this.paused = false
+                this.startTime = Date.now() - this.current
+            }
+        },
+        getTime: function() {
+            if (Date.now() - this.startTime >= this.stopPoint && !this.paused) {
+                this.pause()
+                this.current=this.stopPoint;
+                // console.log(this.finishedFunction)
+                // if (this.finishedFunction !== undefined) this.finishedFunction();
+                // if (!this.ranFunction) {
+                //     if (this.finishedFunction !== undefined) this.finishedFunction();
+                //     this.ranFunction = true;
+                // }
+                return this.stopPoint/1000  
+            } 
+            return this.paused ? this.current / 1000 : (Date.now() - this.startTime) / 1000
+        },
+        getStopPoint: function() {
+            return this.stopPoint/1000;
+        },
+        reset: function() {
+            this.paused = false
+            this.startTime = Date.now()
+        },
+        pause: function() {
+            this.paused = true
+            this.current = (Date.now() - this.startTime)
         }
     };
     var Square = function(game, center, size, color) {
@@ -135,15 +223,16 @@
         this.center = center;
         this.size = size;
         this.color = color;
+        this.originalColor = color;
         this.correct = correct;
     };
     Square.prototype = {
-        draw: function(screen) {
-            drawRect(screen, this, this.color);
+        draw: function(display) {
+            drawRect(display, this, this.color);
         },
         collision: function() {
-            if (this.correct) this.game.choice(true)
-            else this.game.choice(false)
+            if (this.correct) this.game.picked(true)
+            else this.game.picked(false)
         }
     };
     var createSquares = function(game) {
@@ -168,8 +257,7 @@
         otherColor = getOtherColor(color, colorOffset);
         hexColor = rgbToHex(color.r, color.g, color.b);
         hexOtherColor = rgbToHex(otherColor.r, otherColor.g, otherColor.b);
-        //console.log(hexColor, hexOtherColor, chosen);
-        grid = getGrid(count);
+        grid = getGrid(count, game);
         sizex = (game.size.x - ((grid.columns - 1) * game.size.x * 0.02) - (game.size.x * 0.15)) / grid.columns;
         sizey = (game.size.y - ((grid.rows - 1) * game.size.x * 0.02) - (game.size.y * 0.25)) / grid.rows;
         size = Math.min(sizex, sizey, game.size.x * 0.2, game.size.y * 0.2);
@@ -182,17 +270,13 @@
                 chosenColor = hexOtherColor;
                 correct = true;
             }
-else {
+            else {
                 chosenColor = hexColor;
                 correct = false;
             }
             squares.push(new Square(game, {x: x, y: y}, {x: size, y: size}, chosenColor, correct));
         }
         return squares;
-    };
-    var componentToHex = function(c) {
-        var hex = c.toString(16);
-        return hex.length == 1 ? "0" + hex : hex;
     };
     var getOtherColor = function(color, colorOffset) {
         offsetR = Math.floor(Math.random() * (colorOffset + 1));
@@ -220,9 +304,9 @@ else {
         }
     };
     var rgbToHex = function(r, g, b) {
-        return "#" + componentToHex(r) + componentToHex(g) + componentToHex(b);
+        return "rgb("+r+","+g+","+b+")"
     };
-    var getGrid = function(count) {
+    var getGrid = function(count, game) {
         if (count % 4 === 0 && count / 4 > 1) {
             k = 4;
             j = count / 4;
@@ -239,21 +323,19 @@ else {
             k = 1;
             j = count;
         }
-        return {
-            rows: k,
-            columns: j
-        };
+
+        if (game.size.x/game.size.y >= 1) {
+            return {rows: k, columns: j};
+        }
+        else if (game.size.x/game.size.y < 1) {
+            return {rows: j, columns: k};
+        }
+        
     };
     var Player = function(game) {
         this.game = game;
-        this.size = {
-            x: 15,
-            y: 15
-        };
-        this.center = {
-            x: this.game.size.x / 2,
-            y: this.game.size.y - 35
-        };
+        this.size = {x: 1,y: 1};
+        this.center = {x: 1, y: 1};
         this.score = 0;
         this.best = localStorage.getItem('best') || 0;
         this.input = new Input(this.game);
@@ -261,7 +343,6 @@ else {
     Player.prototype = {
         update: function() {
             if (this.input.isTouching()) {
-                //console.log(this.input.touchlocX())
                 var touch = new Touch(this.game, {
                     x: this.input.touchlocX(),
                     y: this.input.touchlocY()
@@ -281,23 +362,24 @@ else {
                 this.best = this.score;
                 localStorage.setItem('best', this.best);
             }
-            if (this.game.timer !== undefined && this.game.timer.isZero()) {
-                this.game.choice(false);
+            if (this.game.timer !== undefined && this.game.timer.isZero() && !this.game.timer.finished && !this.game.isGameOver) {
+                this.game.picked(false);
+                this.game.timer.finished = true;
             }
         },
-        draw: function(screen) {
-            //drawRect(screen, this);
-            screen.textAlign = "left";
-            scoresize = screen.canvas.height / 10;
+        draw: function(display) {
+            //drawRect(display, this);
+            display.textAlign = "left";
+            scoresize = display.canvas.height / 12;
             bestsize = (scoresize * 3) / 8;
-            screen.fillStyle = "black";
-            screen.font = scoresize + "px Arial"; //  768/12  height/12
-            screen.fillText(this.game.player.score, scoresize / 4, scoresize);
-            screen.font = bestsize + "px Arial";
-            screen.fillText("Best: " + this.game.player.best, scoresize / 4, scoresize + bestsize * (5 / 4));
+            display.fillStyle = "black";
+            display.font = scoresize + "px Helvetica"; //  768/12  height/12
+            display.fillText(this.game.player.score, scoresize / 4, scoresize);
+            display.font = bestsize + "px Helvetica";
+            display.fillText("Best: " + this.game.player.best, scoresize / 4, scoresize + bestsize * (5 / 4));
         }
     };
-    var Touch = function(game, center, velocity) {
+    var Touch = function(game, center) {
         this.game = game;
         this.center = center;
         this.size = {
@@ -306,8 +388,8 @@ else {
         };
     };
     Touch.prototype = {
-        draw: function(screen) {
-            drawRect(screen, this, "transparent");
+        draw: function(display) {
+            drawRect(display, this, "transparent");
         },
         collision: function() {
             this.game.removeBody(this);
@@ -327,6 +409,17 @@ else {
         window.addEventListener('touchend', function(e) {
             touching = false;
         });
+        window.addEventListener('mousedown', function(e) {
+            e.preventDefault();
+            touching = true;
+            touchloc = {
+                x: e.clientX,
+                y: e.clientY,
+            };
+        });
+        window.addEventListener('mouseup', function(e) {
+            touching = false;
+        });
         this.isTouching = function() {
             return touching === true;
         };
@@ -337,10 +430,10 @@ else {
             return touchloc.y;
         };
     };
-    var drawRect = function(screen, body, color) {
+    var drawRect = function(display, body, color) {
         color = typeof color !== 'undefined' ? color : "#000000";
-        screen.fillStyle = color;
-        screen.fillRect(body.center.x - body.size.x / 2, body.center.y - body.size.y / 2, body.size.x, body.size.y);
+        display.fillStyle = color;
+        display.fillRect(body.center.x - body.size.x / 2, body.center.y - body.size.y / 2, body.size.x, body.size.y);
     };
     var isColliding = function(b1, b2) {
         return !(b1 === b2 ||
@@ -350,20 +443,10 @@ else {
             b1.center.y - b1.size.y / 2 >= b2.center.y + b2.size.y / 2);
     };
     var reportCollisions = function(bodies) {
-        var bodyPairs = [];
-        for (var i = 0; i < bodies.length; i++) {
-            for (var j = i + 1; j < bodies.length; j++) {
-                if (isColliding(bodies[i], bodies[j])) {
-                    bodyPairs.push([bodies[i], bodies[j]]);
-                }
-            }
-        }
-        for (var i = 0; i < bodyPairs.length; i++) {
-            if (bodyPairs[i][0].collision !== undefined) {
-                bodyPairs[i][0].collision(bodyPairs[i][1]);
-            }
-            if (bodyPairs[i][1].collision !== undefined) {
-                bodyPairs[i][1].collision(bodyPairs[i][0]);
+        j = bodies.length - 1; //player
+        for (var i = 0; i < bodies.length-1; i++) {
+            if (isColliding(bodies[i], bodies[j]) && bodies[i].collision !== undefined) {
+                bodies[i].collision();
             }
         }
     };
