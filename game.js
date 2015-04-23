@@ -117,7 +117,7 @@
     };
     var Countdown = function(game, seconds, permanent, paused) {
         this.game = game;
-        this.size = {x: 1, y: 1};
+        this.size = {x: -1, y: -1};
         this.center = {x: 1, y: 1};
         this.startTime = 0;
         this.current = 0;
@@ -261,8 +261,8 @@
         sizex = (game.size.x - ((grid.columns - 1) * game.size.x * 0.02) - (game.size.x * 0.15)) / grid.columns;
         sizey = (game.size.y - ((grid.rows - 1) * game.size.x * 0.02) - (game.size.y * 0.25)) / grid.rows;
         size = Math.min(sizex, sizey, game.size.x * 0.2, game.size.y * 0.2);
-        bufferx = (game.size.x - (grid.columns * (size + game.size.x * 0.02))) / 2;
-        buffery = (game.size.y - (grid.rows * (size + game.size.y * 0.02))) / 2;
+        bufferx = (game.size.x - (grid.columns * (size + (game.size.x * 0.02)) - (game.size.x * 0.02))) / 2;
+        buffery = (game.size.y - (grid.rows * (size + (game.size.x * 0.02)) - (game.size.x * 0.02))) / 2;
         for (var i = 1; i <= count; i++) {
             var x = bufferx + ((i - 1) % grid.columns) * (size + game.size.x * 0.02) + size / 2;
             var y = buffery + Math.floor((i - 1) / grid.columns) * (size + game.size.x * 0.02) + size / 2;
@@ -334,7 +334,7 @@
     };
     var Player = function(game) {
         this.game = game;
-        this.size = {x: 1,y: 1};
+        this.size = {x: -1,y: -1};
         this.center = {x: 1, y: 1};
         this.score = 0;
         this.best = localStorage.getItem('best') || 0;
@@ -370,7 +370,7 @@
         draw: function(display) {
             //drawRect(display, this);
             display.textAlign = "left";
-            scoresize = display.canvas.height / 12;
+            scoresize = display.canvas.height / 13.33;
             bestsize = (scoresize * 3) / 8;
             display.fillStyle = "black";
             display.font = scoresize + "px Helvetica"; //  768/12  height/12
@@ -382,10 +382,7 @@
     var Touch = function(game, center) {
         this.game = game;
         this.center = center;
-        this.size = {
-            x: 1,
-            y: 1
-        };
+        this.size = {x: -1, y: -1};
     };
     Touch.prototype = {
         draw: function(display) {
