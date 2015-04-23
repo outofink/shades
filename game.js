@@ -448,6 +448,6 @@
         }
     };
     window.addEventListener('load', function() {
-        game = new Game();
+        setTimeout(function(){game = new Game()}, 0);
     });
 })();
