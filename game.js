@@ -1,6 +1,6 @@
 ;(function() {
     var Game = function() {
-        DEBUG = false
+        DEBUG = false;
         this.gameObjects = [];
         this.isGameOver = false;
         this.textTimer = new Timer(1)
@@ -244,19 +244,22 @@
             }
         } 
         else count = 20;
+        //starting difficulty (lower is harder)
         startingOffset = 150;
-        difficultySpeed = 0.4;
+        //rate of increasing diffivulty
+        difficultySpeed = 0.3;
+
         colorOffset = Math.ceil(startingOffset * Math.pow(1 + (-difficultySpeed / 10), 10 * (game.player.score / 10)));
         console.log(colorOffset);
         chosen = Math.floor(Math.random() * count + 1);
+
         color = {
-            r: Math.floor(Math.random() * 256),
-            g: Math.floor(Math.random() * 256),
-            b: Math.floor(Math.random() * 256)
+            h: Math.floor(Math.random() * 360),
+            s: 100 - Math.floor(Math.random() * (colorOffset/startingOffset)*50),
+            l: Math.random() < 0.5 ? 50 - Math.floor(Math.random() * (Math.sqrt(colorOffset)/colorOffset) * 25) : 50 + Math.floor(Math.random() * (Math.sqrt(colorOffset)/colorOffset) * 25)
         };
+
         otherColor = getOtherColor(color, colorOffset);
-        hexColor = rgbToHex(color.r, color.g, color.b);
-        hexOtherColor = rgbToHex(otherColor.r, otherColor.g, otherColor.b);
         grid = getGrid(count, game);
         sizex = (game.size.x - ((grid.columns - 1) * game.size.x * 0.02) - (game.size.x * 0.15)) / grid.columns;
         sizey = (game.size.y - ((grid.rows - 1) * game.size.x * 0.02) - (game.size.y * 0.25)) / grid.rows;
@@ -267,44 +270,26 @@
             var x = bufferx + ((i - 1) % grid.columns) * (size + game.size.x * 0.02) + size / 2;
             var y = buffery + Math.floor((i - 1) / grid.columns) * (size + game.size.x * 0.02) + size / 2;
             if (i == chosen) {
-                chosenColor = hexOtherColor;
+                chosenColor = otherColor;
                 correct = true;
             }
             else {
-                chosenColor = hexColor;
+                chosenColor = color;
                 correct = false;
             }
-            squares.push(new Square(game, {x: x, y: y}, {x: size, y: size}, chosenColor, correct));
+            squares.push(new Square(game, {x: x, y: y}, {x: size, y: size}, "hsl("+chosenColor.h+","+chosenColor.s+"%,"+chosenColor.l+"%)", correct));
         }
         return squares;
     };
     var getOtherColor = function(color, colorOffset) {
-        offsetR = Math.floor(Math.random() * (colorOffset + 1));
-        offsetG = Math.floor(Math.random() * (offsetR + 1));
-        offsetB = colorOffset - (offsetR + offsetG);
-        var offsetR = Math.random() < 0.5 ? offsetR : -offsetR;
-        var offsetG = Math.random() < 0.5 ? offsetG : -offsetG;
-        var offsetB = Math.random() < 0.5 ? offsetB : -offsetB;
+        offsetL = Math.random() < 0.5 ? color.l + colorOffset/5:  color.l - colorOffset/5;
         otherColor = {
-            r: Math.floor(color.r + offsetR),
-            g: Math.floor(color.g + offsetG),
-            b: Math.floor(color.b + offsetB)
+            h: color.h,
+            s: color.s,
+            l: offsetL
         };
-        if (otherColor.r < 0 || otherColor.r > 255) {
-            return getOtherColor(color, colorOffset);
-        }
-        else if (otherColor.g < 0 || otherColor.g > 255) {
-            return getOtherColor(color, colorOffset);
-        } 
-        else if (otherColor.b < 0 || otherColor.b > 255) {
-            return getOtherColor(color, colorOffset);
-        } 
-        else {
-            return otherColor;
-        }
-    };
-    var rgbToHex = function(r, g, b) {
-        return "rgb("+r+","+g+","+b+")"
+        console.log("offsetL: " + offsetL)
+        return otherColor;
     };
     var getGrid = function(count, game) {
         if (count % 4 === 0 && count / 4 > 1) {
