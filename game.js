@@ -58,6 +58,9 @@ function animateOut() {
     action = false;
     squares.animate({transform: "...t"+squares[0].data("slide") +",0"}, 100, "<")
            .animate({"opacity": 0}, 100, "<");
+    squares.forEach(function(el) {
+        el.untouchstart()
+    })
     squares.clear();
 
 	scoreNum.animate({y: scoreNum.attr("y") - scoreNum.data("slide")}, 100, "<")
