@@ -77,10 +77,6 @@ function Square(center, size, color, correct) {
 					isAnswered = true;
 					answer = correct;
 				})
-                .click(function(e) {
-                    isAnswered = true;
-                    answer = correct;
-                })
 				.attr({"fill-opacity":0});
 };
 function drawPoints() {
