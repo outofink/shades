@@ -10,25 +10,33 @@ var dim= {
 
 var isAnswered = false;
 var answer;
+
 var score = 0;
 var best = localStorage.getItem('best') || 0;
-var initBest = true
 //var best = 0;
+
+var initBest = true
 var beat = false;
+
+var scoreNum;
+var bestNum;
+var squares;
+
+var action = true;
 
 function init() {
 	paper = Raphael(0, 0, W, H);
-
+    squares = paper.set();
 	var tick = function() {
             if (isAnswered) {
 				if (answer == true) {
 					score++;
 					if (score > best) {
-						beat = true
+						beat = true;
                 		best++;
                 		localStorage.setItem('best', best);
             		}
-					animateOut()
+					animateOut();
 					createSquares();
 				}
 				else {
@@ -47,23 +55,20 @@ function init() {
 	initPoints();
 };
 function animateOut() {
-	paper.forEach(function (el) {
-		if (el.data("type") == "square") {
-			el.animate({x: el.attr("x")+el.data("slide")}, 100, "<")
-			  .animate({"fill-opacity": 0}, 100, "<", function() {el.remove();})
-			  .data("type", "dead");
-		}
-		else if (el.data("type") == "number") {
-			el.animate({y: el.attr("y")-el.data("slide")}, 100, "<")
-			  .animate({"opacity": 0}, 100, "<", function() {el.remove();})
-			  .data("type", "dead");
-		}
-		else if (el.data("type") == "best" && score == best && beat) {
-			el.animate({y: el.attr("y")-el.data("slide")}, 100, "<")
-			  .animate({"opacity": 0}, 100, "<", function() {el.remove();})
-			  .data("type", "dead");
-		};
-	});
+    action = false;
+    squares.animate({transform: "...t"+squares[0].data("slide") +",0"}, 100, "<")
+           .animate({"opacity": 0}, 100, "<");
+    squares.clear();
+
+	scoreNum.animate({y: scoreNum.attr("y") - scoreNum.data("slide")}, 100, "<")
+	        .animate({"opacity": 0}, 100, "<");
+
+    if ((score == best) && beat) {
+        console.log("OOOOOOOO")
+		bestNum.animate({y: bestNum.attr("y") - bestNum.data("slide")}, 100, "<")
+            .animate({"opacity": 0}, 100, "<");
+            action = true;
+	};
 };
 function Square(center, size, color, correct) {
 	rect = paper.rect(center.x - size.x / 2 - .611*size.x, center.y - size.y / 2, size.x, size.y)
@@ -78,6 +83,7 @@ function Square(center, size, color, correct) {
 					answer = correct;
 				})
 				.attr({"fill-opacity":0});
+    return rect
 };
 function drawPoints() {
 	scoresize = dim.y / 13.33;
@@ -88,18 +94,16 @@ function drawPoints() {
 			"font-family": "Roboto, sans-serif",
 			"opacity": 0
 		})
-		.data("type", "number")
-		.data("slide", .4*scoresize)
-		.data("value", score);
-	bestNum = paper.text(scoresize / 4 + bestsize * 2.4, scoresize + bestsize/1.1 + .4*best, best).attr({ 
-			"font-size": bestsize,
-			"text-anchor": "start", 
-			"font-family": "Roboto, sans-serif",
-			"opacity": 0
-		})
-	    .data("type", "best")
-		.data("slide", .4*best)
-		.data("value", score);
+		.data("slide", .4*scoresize);
+    if (action) {
+    	bestNum = paper.text(scoresize / 4 + bestsize * 2.4, scoresize + bestsize/1.1 + .4*bestsize, best).attr({ 
+    			"font-size": bestsize,
+    			"text-anchor": "start", 
+    			"font-family": "Roboto, sans-serif",
+    			"opacity": 0
+    		})
+    		.data("slide", .4*bestsize);
+    };
 };
 function initPoints() {
 	scoresize = dim.y / 13.33;
@@ -107,11 +111,10 @@ function initPoints() {
 	bestTxt = paper.text(scoresize / 4, scoresize + bestsize/1.1, "Best:").attr({ 
 			"font-size": bestsize,
 			"text-anchor": "start", 
-			"font-family": "Roboto, Pacifico, sans-serif" 
+			"font-family": "Roboto, sans-serif" 
 		});
 };
 function createSquares() {
-    var squares = [];
     if (score < 10) {
         count = score + 3;
         if (count == 13 || count == 11) {
@@ -125,7 +128,7 @@ function createSquares() {
     difficultySpeed = 0.3;
 
     colorOffset = Math.ceil(startingOffset * Math.pow(1 + (-difficultySpeed / 10), 10 * (score / 10)));
-    console.log(colorOffset);
+    //console.log(colorOffset);
     chosen = Math.floor(Math.random() * count + 1);
 
     color = {
@@ -155,23 +158,20 @@ function createSquares() {
         rgb = hsl2rgb(chosenColor.h, chosenColor.s, chosenColor.l);
         squares.push(new Square({x: x, y: y}, {x: size, y: size}, "rgb("+rgb.r+","+rgb.g+","+rgb.b+")", correct));
     };
+    //squares.data("slide", squares[0].data("slide"))
     drawPoints();
     window.setTimeout(function() {
-		paper.forEach(function (el) {
-			if (el.data("type") == "square") {
-				el.animate({x: el.attr("x")+el.data("slide")}, 100, "<")
-				  .animate({"fill-opacity": 1}, 100, "<")
-			}
-			else if (el.data("type") == "number") {
-				el.animate({y: el.attr("y")-el.data("slide")}, 100, "<")
-				  .animate({"opacity": 1}, 100, "<")
-			}
-			else if (el.data("type") == "best" && ((score == best && beat) || initBest)) {
-				el.animate({y: el.attr("y")-el.data("slide")}, 100, "<")
-				  .animate({"opacity": 1}, 100, "<");
-				initBest = false
-			};
-		});
+        squares.animate({transform: "t" + squares[0].data("slide") +",0"}, 100, "<")
+               .animate({"fill-opacity": 1}, 100, "<");
+
+        scoreNum.animate({y: scoreNum.attr("y")-scoreNum.data("slide")}, 100, "<")
+                .animate({"opacity": 1}, 100, "<");
+
+        if (((score == best) && beat) || initBest) {
+            bestNum.animate({y: bestNum.attr("y")-bestNum.data("slide")}, 100, "<")
+                .animate({"opacity": 1}, 100, "<");
+            initBest = false;
+        }
 	}, 100);
 };
 function getOtherColor(color, colorOffset) {
@@ -181,7 +181,7 @@ function getOtherColor(color, colorOffset) {
         s: color.s,
         l: offsetL
     };
-    console.log("offsetL: " + offsetL)
+    //console.log("offsetL: " + offsetL)
     return otherColor;
 };
 function hsl2rgb(h, s, l) {
