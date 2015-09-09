@@ -52,13 +52,13 @@ function animateOut() {
 			el.animate({x: el.attr("x")+el.data("slide")}, 100, "<")
 			  .animate({"fill-opacity": 0}, 100, "<", function() {el.remove();})
 			  .data("type", "dead");
-		};
-		if (el.data("type") == "number") {
+		}
+		else if (el.data("type") == "number") {
 			el.animate({y: el.attr("y")-el.data("slide")}, 100, "<")
 			  .animate({"opacity": 0}, 100, "<", function() {el.remove();})
 			  .data("type", "dead");
-		};
-		if (el.data("type") == "best" && score == best && beat) {
+		}
+		else if (el.data("type") == "best" && score == best && beat) {
 			el.animate({y: el.attr("y")-el.data("slide")}, 100, "<")
 			  .animate({"opacity": 0}, 100, "<", function() {el.remove();})
 			  .data("type", "dead");
@@ -162,11 +162,11 @@ function createSquares() {
 				el.animate({x: el.attr("x")+el.data("slide")}, 100, "<")
 				  .animate({"fill-opacity": 1}, 100, "<")
 			}
-			if (el.data("type") == "number") {
+			else if (el.data("type") == "number") {
 				el.animate({y: el.attr("y")-el.data("slide")}, 100, "<")
 				  .animate({"opacity": 1}, 100, "<")
 			}
-			if (el.data("type") == "best" && ((score == best && beat) || initBest)) {
+			else if (el.data("type") == "best" && ((score == best && beat) || initBest)) {
 				el.animate({y: el.attr("y")-el.data("slide")}, 100, "<")
 				  .animate({"opacity": 1}, 100, "<");
 				initBest = false
