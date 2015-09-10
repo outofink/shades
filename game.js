@@ -61,12 +61,12 @@ function animateOut() {
 
     setTimeout(createSquares, 0);
 
-	scoreNum.animate({transform: "t0,-"+scoreNum.data("slide")}, 100, "<", function() {scoreNum.attr({"transform": "t0,"+2*scoreNum.data("slide")})})
-	        .animate({"opacity": 0}, 100, "<");
+	scoreNum.animate({transform: "t0,-"+scoreNum.data("slide")}, 50, "<", function() {scoreNum.attr({"transform": "t0,"+2*scoreNum.data("slide")})})
+	        .animate({"opacity": 0}, 50, "<");
 
     if ((score == best) && beat) {
-		bestNum.animate({transform: "t0,-"+bestNum.data("slide")}, 100, "<", function() {bestNum.attr({"transform": "t0,"+2*bestNum.data("slide")})})
-            .animate({"opacity": 0}, 100, "<");
+		bestNum.animate({transform: "t0,-"+bestNum.data("slide")}, 50, "<", function() {bestNum.attr({"transform": "t0,"+2*bestNum.data("slide")})})
+            .animate({"opacity": 0}, 50, "<");
             action = true;
 	};
 };
@@ -196,17 +196,18 @@ function createSquares() {
         iterator++;
     };
     drawPoints();
+    
     window.setTimeout(function() {
 
-        scoreNum.animate({transform: "...t0,-"+scoreNum.data("slide")}, 100, "<")
-                .animate({"opacity": 1}, 100, "<");
+        scoreNum.animate({transform: "...t0,-"+scoreNum.data("slide")}, 50, "<")
+                .animate({"opacity": 1}, 50, "<");
 
         if (((score == best) && beat) || initBest) {
-            bestNum.animate({transform: "...t0,-"+bestNum.data("slide")}, 100, "<")
-                .animate({"opacity": 1}, 100, "<");
+            bestNum.animate({transform: "...t0,-"+bestNum.data("slide")}, 50, "<")
+                .animate({"opacity": 1}, 50, "<");
             initBest = false;
         }
-	}, 100);
+	}, 50);
 
 };
 function getOtherColor(color, colorOffset) {
