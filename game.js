@@ -196,14 +196,14 @@ function createSquares() {
         iterator++;
     };
     drawPoints();
-    
+
     window.setTimeout(function() {
 
-        scoreNum.animate({transform: "...t0,-"+scoreNum.data("slide")}, 50, "<")
+        scoreNum.animate({transform: "t0," + 2*scoreNum.data("slide") + "t0,-"+scoreNum.data("slide")}, 50, "<")
                 .animate({"opacity": 1}, 50, "<");
 
         if (((score == best) && beat) || initBest) {
-            bestNum.animate({transform: "...t0,-"+bestNum.data("slide")}, 50, "<")
+            bestNum.animate({transform: "t0," + 2*bestNum.data("slide") + "t0,-"+bestNum.data("slide")}, 50, "<")
                 .animate({"opacity": 1}, 50, "<");
             initBest = false;
         }
