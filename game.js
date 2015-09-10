@@ -58,10 +58,8 @@ function init() {
 };
 function animateOut() {
     action = false;
-    squares.animate({transform: "...t"+squares[0].data("slide") +",0",
-        "fill-opacity": 0}, 100, "<");
+
     setTimeout(createSquares, 100);
-    //squares.clear();
 
 	scoreNum.animate({transform: "t0,-"+scoreNum.data("slide")}, 100, "<", function() {scoreNum.attr({"transform": "t0,"+2*scoreNum.data("slide")})})
 	        .animate({"opacity": 0}, 100, "<");
@@ -75,7 +73,7 @@ function animateOut() {
 function Square(center, size, color, correct) {
     console.log(squares.length)
     if (iterator >= squares.length) {
-	rect = paper.rect(center.x - size.x / 2 - .611*size.x, center.y - size.y / 2, size.x, size.y)
+	rect = paper.rect(center.x - size.x / 2, center.y - size.y / 2, size.x, size.y)
 				.attr({
 					fill: Raphael.color(color),
 					"stroke-opacity": 0
@@ -85,16 +83,14 @@ function Square(center, size, color, correct) {
 					isAnswered = true;
 					answer = correct;
 				})
-				.attr({"fill-opacity":0});
     squares.push(rect);
     }
     else {
         squares[iterator].untouchstart();
-        squares[iterator].transform("");
 
         squares[iterator]
                 .attr({
-                    "x":center.x - size.x / 2 - .611*size.x,
+                    "x":center.x - size.x / 2,
                     "y":center.y - size.y / 2,
                     "width":size.x,
                     "height":size.y,
@@ -104,7 +100,6 @@ function Square(center, size, color, correct) {
                     isAnswered = true;
                     answer = correct;
                 })
-                .attr({"fill-opacity":0});
     }
 };
 function drawPoints() {
@@ -213,11 +208,6 @@ function createSquares() {
         }
 	}, 100);
 
-    var inAnim = Raphael.animation(
-        {transform: "...t" + squares[0].data("slide") +",0",
-         "fill-opacity": 1}, 100, "<");
-
-    squares.animate(inAnim.delay(100));
 };
 function getOtherColor(color, colorOffset) {
     offsetL = Math.random() < 0.5 ? color.l + colorOffset/5:  color.l - colorOffset/5;
