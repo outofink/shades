@@ -59,7 +59,7 @@ function init() {
 function animateOut() {
     action = false;
 
-    setTimeout(createSquares, 100);
+    setTimeout(createSquares, 0);
 
 	scoreNum.animate({transform: "t0,-"+scoreNum.data("slide")}, 100, "<", function() {scoreNum.attr({"transform": "t0,"+2*scoreNum.data("slide")})})
 	        .animate({"opacity": 0}, 100, "<");
@@ -191,7 +191,7 @@ function createSquares() {
             correct = false;
         }
         rgb = hsl2rgb(chosenColor.h, chosenColor.s, chosenColor.l);
-        
+
         Square({x: x, y: y}, {x: size, y: size}, "rgb("+rgb.r+","+rgb.g+","+rgb.b+")", correct);
         iterator++;
     };
