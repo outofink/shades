@@ -13,7 +13,7 @@ var answer;
 
 var score = 0;
 var best = localStorage.getItem('best') || 0;
-//var best = 0;
+var best = 0;
 
 var initBest = true
 var beat = false;
@@ -24,9 +24,15 @@ var squares;
 
 var action = true;
 
+var iterator;
+
 function init() {
 	paper = Raphael(0, 0, W, H);
     squares = paper.set();
+
+    initPoints();
+    createSquares();
+
 	var tick = function() {
             if (isAnswered) {
 				if (answer == true) {
@@ -37,12 +43,11 @@ function init() {
                 		localStorage.setItem('best', best);
             		}
 					animateOut();
-					createSquares();
 				}
 				else {
 					score = 0;
 					animateOut();
-					createSquares();
+					
 					beat = false;
 				}
 			}
@@ -50,62 +55,72 @@ function init() {
             requestAnimationFrame(tick);
     };
     tick();
-
-	createSquares();
-	initPoints();
 };
 function animateOut() {
     action = false;
-    squares.animate({transform: "...t"+squares[0].data("slide") +",0"}, 100, "<")
-           .animate({"opacity": 0}, 100, "<");
-    squares.forEach(function(el) {
-        el.untouchstart()
-    })
-    squares.clear();
+    squares.animate({transform: "...t"+squares[0].data("slide") +",0",
+        "fill-opacity": 0}, 100, "<");
+    setTimeout(createSquares, 100);
+    //squares.clear();
 
-	scoreNum.animate({y: scoreNum.attr("y") - scoreNum.data("slide")}, 100, "<")
+	scoreNum.animate({transform: "t0,-"+scoreNum.data("slide")}, 100, "<", function() {scoreNum.attr({"transform": "t0,"+2*scoreNum.data("slide")})})
 	        .animate({"opacity": 0}, 100, "<");
 
     if ((score == best) && beat) {
-        console.log("OOOOOOOO")
-		bestNum.animate({y: bestNum.attr("y") - bestNum.data("slide")}, 100, "<")
+		bestNum.animate({transform: "t0,-"+bestNum.data("slide")}, 100, "<", function() {bestNum.attr({"transform": "t0,"+2*bestNum.data("slide")})})
             .animate({"opacity": 0}, 100, "<");
             action = true;
 	};
 };
 function Square(center, size, color, correct) {
+    console.log(squares.length)
+    if (iterator >= squares.length) {
 	rect = paper.rect(center.x - size.x / 2 - .611*size.x, center.y - size.y / 2, size.x, size.y)
 				.attr({
 					fill: Raphael.color(color),
 					"stroke-opacity": 0
 				})
-				.data("type", "square")
 				.data("slide", .611*size.x)
 				.touchstart(function(e) {
 					isAnswered = true;
 					answer = correct;
 				})
 				.attr({"fill-opacity":0});
-    return rect
+    squares.push(rect);
+    }
+    else {
+        squares[iterator].untouchstart();
+        squares[iterator].transform("");
+
+        squares[iterator]
+                .attr({
+                    "x":center.x - size.x / 2 - .611*size.x,
+                    "y":center.y - size.y / 2,
+                    "width":size.x,
+                    "height":size.y,
+                    fill: Raphael.color(color),
+                })
+                .touchstart(function(e) {
+                    isAnswered = true;
+                    answer = correct;
+                })
+                .attr({"fill-opacity":0});
+    }
 };
 function drawPoints() {
+    
 	scoresize = dim.y / 13.33;
     bestsize = (scoresize * 3) / 7;
-	scoreNum = paper.text(scoresize / 4, scoresize / 1.5 + .4*scoresize, score).attr({ 
-			"font-size": scoresize,
-			"text-anchor": "start", 
-			"font-family": "Roboto, sans-serif",
+
+	scoreNum.attr({
+			"text": score,
 			"opacity": 0
 		})
-		.data("slide", .4*scoresize);
     if (action) {
-    	bestNum = paper.text(scoresize / 4 + bestsize * 2.4, scoresize + bestsize/1.1 + .4*bestsize, best).attr({ 
-    			"font-size": bestsize,
-    			"text-anchor": "start", 
-    			"font-family": "Roboto, sans-serif",
+    	bestNum.attr({ 
+    			"text": best,
     			"opacity": 0
     		})
-    		.data("slide", .4*bestsize);
     };
 };
 function initPoints() {
@@ -116,6 +131,25 @@ function initPoints() {
 			"text-anchor": "start", 
 			"font-family": "Roboto, sans-serif" 
 		});
+    scoreNum = paper.text(scoresize / 4, scoresize / 1.5 - .4*scoresize, score).attr({ 
+            "font-size": scoresize,
+            "text-anchor": "start", 
+            "font-family": "Roboto, sans-serif",
+            "opacity": 0
+        })
+        .data("slide", .4*scoresize);
+
+        scoreNum.attr({"transform": "t0,"+2*scoreNum.data("slide")})
+    if (action) {
+        bestNum = paper.text(scoresize / 4 + bestsize * 2.4, scoresize + bestsize/1.1 - .4*bestsize, best).attr({ 
+                "font-size": bestsize,
+                "text-anchor": "start", 
+                "font-family": "Roboto, sans-serif",
+                "opacity": 0
+            })
+            .data("slide", .4*bestsize);
+        bestNum.attr({"transform": "t0,"+2*bestNum.data("slide")})
+    };
 };
 function createSquares() {
     if (score < 10) {
@@ -147,6 +181,9 @@ function createSquares() {
     size = Math.min(sizex, sizey, dim.x * 0.2, dim.y * 0.2);
     bufferx = (dim.x - (grid.columns * (size + (dim.x * 0.02)) - (dim.x * 0.02))) / 2;
     buffery = (dim.y - (grid.rows * (size + (dim.x * 0.02)) - (dim.x * 0.02))) / 2;
+
+    squares.attr({"width": 0, "height":0});
+    iterator = 0;
     for (var i = 1; i <= count; i++) {
         var x = bufferx + ((i - 1) % grid.columns) * (size + dim.x * 0.02) + size / 2;
         var y = buffery + Math.floor((i - 1) / grid.columns) * (size + dim.x * 0.02) + size / 2;
@@ -159,23 +196,28 @@ function createSquares() {
             correct = false;
         }
         rgb = hsl2rgb(chosenColor.h, chosenColor.s, chosenColor.l);
-        squares.push(new Square({x: x, y: y}, {x: size, y: size}, "rgb("+rgb.r+","+rgb.g+","+rgb.b+")", correct));
+        
+        Square({x: x, y: y}, {x: size, y: size}, "rgb("+rgb.r+","+rgb.g+","+rgb.b+")", correct);
+        iterator++;
     };
-    //squares.data("slide", squares[0].data("slide"))
     drawPoints();
     window.setTimeout(function() {
-        squares.animate({transform: "t" + squares[0].data("slide") +",0"}, 100, "<")
-               .animate({"fill-opacity": 1}, 100, "<");
 
-        scoreNum.animate({y: scoreNum.attr("y")-scoreNum.data("slide")}, 100, "<")
+        scoreNum.animate({transform: "...t0,-"+scoreNum.data("slide")}, 100, "<")
                 .animate({"opacity": 1}, 100, "<");
 
         if (((score == best) && beat) || initBest) {
-            bestNum.animate({y: bestNum.attr("y")-bestNum.data("slide")}, 100, "<")
+            bestNum.animate({transform: "...t0,-"+bestNum.data("slide")}, 100, "<")
                 .animate({"opacity": 1}, 100, "<");
             initBest = false;
         }
 	}, 100);
+
+    var inAnim = Raphael.animation(
+        {transform: "...t" + squares[0].data("slide") +",0",
+         "fill-opacity": 1}, 100, "<");
+
+    squares.animate(inAnim.delay(100));
 };
 function getOtherColor(color, colorOffset) {
     offsetL = Math.random() < 0.5 ? color.l + colorOffset/5:  color.l - colorOffset/5;
