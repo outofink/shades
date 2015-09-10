@@ -13,7 +13,7 @@ var answer;
 
 var score = 0;
 var best = localStorage.getItem('best') || 0;
-var best = 0;
+//var best = 0;
 
 var initBest = true
 var beat = false;
