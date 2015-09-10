@@ -78,7 +78,6 @@ function Square(center, size, color, correct) {
 					fill: Raphael.color(color),
 					"stroke-opacity": 0
 				})
-				.data("slide", .611*size.x)
 				.touchstart(function(e) {
 					isAnswered = true;
 					answer = correct;
