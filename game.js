@@ -71,27 +71,21 @@ function animateOut() {
 	};
 };
 function Square(center, size, color, correct) {
-    //console.log(squares.length)
+    console.log(squares.length)
     if (iterator >= squares.length) {
 	rect = paper.rect(center.x - size.x / 2, center.y - size.y / 2, size.x, size.y)
 				.attr({
 					fill: Raphael.color(color),
 					"stroke-opacity": 0
 				})
-				.touchend(function(e) {
+				.touchstart(function(e) {
 					isAnswered = true;
 					answer = correct;
 				})
-                .click(function(e) {
-                    isAnswered = true;
-                    answer = correct;
-                })
     squares.push(rect);
     }
     else {
-        squares[iterator].untouchend();
-        squares[iterator].unclick();
-
+        squares[iterator].untouchstart();
 
         squares[iterator]
                 .attr({
@@ -101,11 +95,7 @@ function Square(center, size, color, correct) {
                     "height":size.y,
                     fill: Raphael.color(color),
                 })
-                .touchend(function(e) {
-                    isAnswered = true;
-                    answer = correct;
-                })
-                .click(function(e) {
+                .touchstart(function(e) {
                     isAnswered = true;
                     answer = correct;
                 })
