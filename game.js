@@ -3,128 +3,35 @@ var paper;
 var W = window.innerWidth;
 var H = window.innerHeight;
 
-var dim= {
-	x: W,
-	y: H
-};
-
-var isAnswered = false;
-var answer;
-
 var score = 0;
 var best = localStorage.getItem('best') || 0;
-//var best = 0;
 
-var initBest = true
-var beat = false;
+var oldbest = best - 1;
 
 var scoreNum;
 var bestNum;
-var squares;
+var squares = [];
 
-var action = true;
-
-var iterator;
+//starting difficulty (lower is harder)
+var startingOffset = 150;
+    //rate of increasing difficulty (lower is harder)
+var difficultySpeed = .97;
 
 function init() {
 	paper = Raphael(0, 0, W, H);
-    squares = paper.set();
-
     initPoints();
     createSquares();
-
-	var tick = function() {
-            if (isAnswered) {
-				if (answer == true) {
-					score++;
-					if (score > best) {
-						beat = true;
-                		best++;
-                		localStorage.setItem('best', best);
-            		}
-					animateOut();
-				}
-				else {
-					score = 0;
-					animateOut();
-					
-					beat = false;
-				}
-			}
-			isAnswered = false;
-            requestAnimationFrame(tick);
-    };
-    tick();
 };
-function animateOut() {
-    action = false;
 
-    setTimeout(createSquares, 0);
-
-	scoreNum.animate({transform: "t0,-"+scoreNum.data("slide")}, 50, "<", function() {scoreNum.attr({"transform": "t0,"+2*scoreNum.data("slide")})})
-	        .animate({"opacity": 0}, 50, "<");
-
-    if ((score == best) && beat) {
-		bestNum.animate({transform: "t0,-"+bestNum.data("slide")}, 50, "<", function() {bestNum.attr({"transform": "t0,"+2*bestNum.data("slide")})})
-            .animate({"opacity": 0}, 50, "<");
-            action = true;
-	};
-};
-function Square(center, size, color, correct) {
-    console.log(squares.length)
-    if (iterator >= squares.length) {
-	rect = paper.rect(center.x - size.x / 2, center.y - size.y / 2, size.x, size.y)
-				.attr({
-					fill: Raphael.color(color),
-					"stroke-opacity": 0
-				})
-				.touchstart(function(e) {
-					isAnswered = true;
-					answer = correct;
-				})
-    squares.push(rect);
-    }
-    else {
-        squares[iterator].untouchstart();
-
-        squares[iterator]
-                .attr({
-                    "x":center.x - size.x / 2,
-                    "y":center.y - size.y / 2,
-                    "width":size.x,
-                    "height":size.y,
-                    fill: Raphael.color(color),
-                })
-                .touchstart(function(e) {
-                    isAnswered = true;
-                    answer = correct;
-                })
-    }
-};
-function drawPoints() {
-    
-	scoresize = dim.y / 13.33;
-    bestsize = (scoresize * 3) / 7;
-
-	scoreNum.attr({
-			"text": score,
-			"opacity": 0
-		})
-    if (action) {
-    	bestNum.attr({ 
-    			"text": best,
-    			"opacity": 0
-    		})
-    };
-};
 function initPoints() {
-	scoresize = dim.y / 13.33;
+    scoresize = H / 13.33;
     bestsize = (scoresize * 3) / 7;
-	bestTxt = paper.text(scoresize / 4, scoresize + bestsize/1.1, "Best:").attr({ 
-			"font-size": bestsize,
-			"text-anchor": "start", 
-			"font-family": "Roboto, sans-serif" 
-		});
+    bestTxt = paper.text(scoresize / 4, scoresize + bestsize/1.1, "Best:").attr({ 
+            "font-size": bestsize,
+            "text-anchor": "start", 
+            "font-family": "Roboto, sans-serif" 
+        });
+
     scoreNum = paper.text(scoresize / 4, scoresize / 1.5 - .4*scoresize, score).attr({ 
             "font-size": scoresize,
             "text-anchor": "start", 
@@ -133,54 +40,66 @@ function initPoints() {
         })
         .data("slide", .4*scoresize);
 
-        scoreNum.attr({"transform": "t0,"+2*scoreNum.data("slide")})
-    if (action) {
-        bestNum = paper.text(scoresize / 4 + bestsize * 2.4, scoresize + bestsize/1.1 - .4*bestsize, best).attr({ 
-                "font-size": bestsize,
-                "text-anchor": "start", 
-                "font-family": "Roboto, sans-serif",
-                "opacity": 0
-            })
-            .data("slide", .4*bestsize);
-        bestNum.attr({"transform": "t0,"+2*bestNum.data("slide")})
-    };
+    scoreNum.attr({"transform": "t0,"+2*scoreNum.data("slide")});
+
+    bestNum = paper.text(scoresize / 4 + bestsize * 2.4, scoresize + bestsize/1.1 - .4*bestsize, best).attr({ 
+            "font-size": bestsize,
+            "text-anchor": "start", 
+            "font-family": "Roboto, sans-serif",
+            "opacity": 0
+        })
+        .data("slide", .4*bestsize);
+    bestNum.attr({"transform": "t0,"+2*bestNum.data("slide")});
+    updatePoints()
 };
+
+function animateOut() {
+	scoreNum.animate({transform: "t0,-"+scoreNum.data("slide")}, 50, "<")
+	        .animate({"opacity": 0}, 50, "<");
+
+    if (best > oldbest) {
+		bestNum.animate({transform: "t0,-"+bestNum.data("slide")}, 50, "<")
+            .animate({"opacity": 0}, 50, "<");
+	};
+};
+
+function animateIn() {
+    scoreNum.animate({transform: "t0," + 2*scoreNum.data("slide") + "t0,-" + scoreNum.data("slide")}, 50, "<")
+            .animate({"opacity": 1}, 50, "<");
+
+    if (best > oldbest) {
+        bestNum.animate({transform: "t0," + 2*bestNum.data("slide") + "t0,-" + bestNum.data("slide")}, 50, "<")
+            .animate({"opacity": 1}, 50, "<");
+        oldbest = best;
+    }
+};
+
+function updatePoints() {
+    animateOut()
+
+    window.setTimeout(function() {
+        scoresize = H / 13.33;
+        bestsize = (scoresize * 3) / 7;
+
+        scoreNum.attr({"text": score});
+        bestNum.attr({"text": best});
+        animateIn();    
+    }, 50);
+};
+
 function createSquares() {
-    if (score < 10) {
-        count = score + 3;
-        if (count == 13 || count == 11) {
-            count += 1;
-        }
-    } 
-    else count = 20;
-    //starting difficulty (lower is harder)
-    startingOffset = 150;
-    //rate of increasing diffivulty
-    difficultySpeed = 0.3;
-
-    colorOffset = Math.ceil(startingOffset * Math.pow(1 + (-difficultySpeed / 10), 10 * (score / 10)));
-    //console.log(colorOffset);
-    chosen = Math.floor(Math.random() * count + 1);
-
-    color = {
-        h: Math.floor(Math.random() * 360),
-        s: 100 - Math.floor(Math.random() * (colorOffset/startingOffset)*50),
-        l: Math.random() < 0.5 ? 50 - Math.floor(Math.random() * (Math.sqrt(colorOffset)/colorOffset) * 25) : 50 + Math.floor(Math.random() * (Math.sqrt(colorOffset)/colorOffset) * 25)
-    };
-
-    otherColor = getOtherColor(color, colorOffset);
+    count = getCount();
     grid = getGrid(count);
-    sizex = (dim.x - ((grid.columns - 1) * dim.x * 0.02) - (dim.x * 0.15)) / grid.columns;
-    sizey = (dim.y - ((grid.rows - 1) * dim.x * 0.02) - (dim.y * 0.25)) / grid.rows;
-    size = Math.min(sizex, sizey, dim.x * 0.2, dim.y * 0.2);
-    bufferx = (dim.x - (grid.columns * (size + (dim.x * 0.02)) - (dim.x * 0.02))) / 2;
-    buffery = (dim.y - (grid.rows * (size + (dim.x * 0.02)) - (dim.x * 0.02))) / 2;
 
-    squares.attr({"width": 0, "height":0});
-    iterator = 0;
+    var [size, buffer] = getSizing(grid);
+
+    var [color, otherColor] = genColors();
+    var chosen = Math.floor(Math.random() * count + 1);
+
+    clearSquares();
     for (var i = 1; i <= count; i++) {
-        var x = bufferx + ((i - 1) % grid.columns) * (size + dim.x * 0.02) + size / 2;
-        var y = buffery + Math.floor((i - 1) / grid.columns) * (size + dim.x * 0.02) + size / 2;
+        var x = buffer.x + ((i - 1) % grid.columns) * (size + W * 0.02) + size / 2;
+        var y = buffer.y + Math.floor((i - 1) / grid.columns) * (size + W * 0.02) + size / 2;
         if (i == chosen) {
             chosenColor = otherColor;
             correct = true;
@@ -189,26 +108,89 @@ function createSquares() {
             chosenColor = color;
             correct = false;
         }
-        rgb = hsl2rgb(chosenColor.h, chosenColor.s, chosenColor.l);
+        var [r, g, b] = hsl2rgb(chosenColor.h, chosenColor.s, chosenColor.l);
+        var rgb = "rgb("+r+","+g+","+b+")"
+        squares.push(genSquare({x: x, y: y}, {x: size, y: size}, rgb, correct));
+    } 
+};
 
-        Square({x: x, y: y}, {x: size, y: size}, "rgb("+rgb.r+","+rgb.g+","+rgb.b+")", correct);
-        iterator++;
-    };
-    drawPoints();
-
-    window.setTimeout(function() {
-
-        scoreNum.animate({transform: "t0," + 2*scoreNum.data("slide") + "t0,-"+scoreNum.data("slide")}, 50, "<")
-                .animate({"opacity": 1}, 50, "<");
-
-        if (((score == best) && beat) || initBest) {
-            bestNum.animate({transform: "t0," + 2*bestNum.data("slide") + "t0,-"+bestNum.data("slide")}, 50, "<")
-                .animate({"opacity": 1}, 50, "<");
-            initBest = false;
+function getCount() {
+    if (score < 18) {
+        count = score + 3;
+        if ([7, 11, 13, 17, 19].includes(count)) {
+            count += 1;
         }
-	}, 50);
+    }
+    else {
+        count = 20;
+    }
+    if (count == 14) { // I just don't like the way 14 looks
+        count = 15; // Yes, I know hardcoding is evil
+    }
+    return count
+};
+
+function getSizing(grid) {
+    sizes = {
+        x: (W - ((grid.columns - 1) * W * 0.02) - (W * 0.15)) / grid.columns,
+        y: (H - ((grid.rows - 1) * W * 0.02) - (H * 0.25)) / grid.rows
+    }
+    size = Math.min(sizes.x, sizes.y, W * 0.2, H * 0.2);
+    buffer = {
+        x: (W - (grid.columns * (size + (W * 0.02)) - (W * 0.02))) / 2,
+        y: (H - (grid.rows * (size + (W * 0.02)) - (W * 0.02))) / 2
+    }
+    return [size, buffer]
 
 };
+
+function genColors() {
+    colorOffset = Math.ceil(startingOffset * Math.pow(difficultySpeed, score));
+
+    color = {
+        h: Math.floor(Math.random() * 360),
+        s: 100 - Math.floor(Math.random() * (colorOffset/startingOffset)*50),
+        l: Math.random() < 0.5 ? 50 - Math.floor((Math.random() * 25) / Math.sqrt(colorOffset)) : 50 + Math.floor((Math.random() * 25) / Math.sqrt(colorOffset))
+    };
+
+    otherColor = getOtherColor(color, colorOffset);
+
+    return [color, otherColor]
+};
+
+function clearSquares() {
+    squares.forEach(function(square) {
+        square.remove()
+    })
+    squares.length = 0;
+};
+
+function genSquare(center, size, color, correct) {
+    rect = paper.rect(center.x - size.x / 2, center.y - size.y / 2, size.x, size.y)
+                .attr({
+                    fill: Raphael.color(color),
+                    "stroke-opacity": 0
+                })
+                .touchstart(function(e) {
+                    answer(correct);
+                    updatePoints();
+                    createSquares();
+                })
+    return rect
+};
+
+function answer(correct) {
+    if (!correct) {
+        score = 0;
+        return
+    }
+    score++;
+    if (score > best) {
+        best++;
+        localStorage.setItem('best', best);
+    }
+};
+
 function getOtherColor(color, colorOffset) {
     offsetL = Math.random() < 0.5 ? color.l + colorOffset/5:  color.l - colorOffset/5;
     otherColor = {
@@ -217,12 +199,13 @@ function getOtherColor(color, colorOffset) {
         l: offsetL
     };
     //console.log("offsetL: " + offsetL)
-    return otherColor;
+    return otherColor
 };
+
 function hsl2rgb(h, s, l) {
     var m1, m2, hue;
     var r, g, b
-    s /=100;
+    s /= 100;
     l /= 100;
     if (s == 0)
         r = g = b = (l * 255);
@@ -237,8 +220,9 @@ function hsl2rgb(h, s, l) {
         g = Math.round(HueToRgb(m1, m2, hue));
         b = Math.round(HueToRgb(m1, m2, hue - 1/3));
     }
-    return {r: r, g: g, b: b};
+    return [r, g, b];
 };
+
 function HueToRgb(m1, m2, hue) {
     var v;
     if (hue < 0)
@@ -257,31 +241,27 @@ function HueToRgb(m1, m2, hue) {
 
     return 255 * v;
 };
-function getGrid(count) {
-    if (count % 4 === 0 && count / 4 > 1) {
-        k = 4;
-        j = count / 4;
-    } 
-    else if (count % 3 === 0 && count / 3 > 1) {
-        k = 3;
-        j = count / 3;
-    } 
-    else if (count % 2 === 0 && count / 2 > 1) {
-        k = 2;
-        j = count / 2;
-    } 
-    else if (count < 10) {
-        k = 1;
-        j = count;
-    }
 
-    if (dim.x/dim.y >= 1) {
+function getGrid(count) {
+    k = 1;
+    j = count;
+    [2, 3, 4].forEach(function(number) {
+        if (count % number === 0 && count / number !== 1) {
+            k = number;
+            j = count / number;
+        }
+    });
+
+    [k, j] = [k, j].sort()
+
+    if (W / H >= 1) {
         return {rows: k, columns: j};
     }
-    else if (dim.x/dim.y < 1) {
+    else {
         return {rows: j, columns: k};
     }
 };
+
 window.onload = function() {
     init();
 };
