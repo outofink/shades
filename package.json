@@ -1,0 +1,32 @@
+{
+  "name": "shades",
+  "version": "1.0.0",
+  "description": "If you are color blind, this isn't the game for you.",
+  "scripts": {
+    "babel": "babel --presets env js/game.js -o build/game.bundle.js",
+    "start": "http-server",
+    "webpack": "webpack"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/outofink/Shades.git"
+  },
+  "author": "outofink",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/outofink/Shades/issues"
+  },
+  "homepage": "https://github.com/outofink/Shadese",
+  "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-core": "^6.26.0",
+    "babel-loader": "^7.1.2",
+    "babel-preset-env": "^1.6.0",
+    "http-server": "^0.10.0",
+    "webpack": "^3.8.0"
+  },
+  "dependencies": {
+    "eve": "^0.5.4",
+    "raphael": "^2.2.7"
+  }
+}

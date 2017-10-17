@@ -1,3 +1,6 @@
+import eve from 'eve';
+import Raphael from 'raphael';
+
 let paper;
 
 const W = window.innerWidth;
@@ -211,7 +214,6 @@ let getOtherColor = (color, colorOffset) => {
         s: color.s,
         l: offsetL
     };
-    //console.log('offsetL: ' + offsetL)
     return otherColor;
 };
 
