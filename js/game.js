@@ -53,7 +53,7 @@ let initPoints = () => {
         'font-family': 'Roboto, sans-serif',
         'opacity': 0
     });
-    scoreNum.attr({'transform': 't0,'+ 0.8 * scoresize});
+    scoreNum.attr({'transform': `t0,${0.8 * scoresize}`});
 
     bestNum = paper.text(scoresize / 4 + bestsize * 2.4, scoresize + bestsize / 1.1 - 0.4 * bestsize, best).attr({
         'font-size': bestsize,
@@ -61,26 +61,26 @@ let initPoints = () => {
         'font-family': 'Roboto, sans-serif',
         'opacity': 0
     });
-    bestNum.attr({'transform': 't0,'+ 0.8 * bestsize});
+    bestNum.attr({'transform': `t0,${0.8 * bestsize}`});
     updatePoints();
 };
 
 let animateOut = () => {
-    scoreNum.animate({transform: 't0,-'+ 0.4 * scoresize}, 50, '<')
+    scoreNum.animate({transform: `t0,-${0.4 * scoresize}`}, 50, '<')
         .animate({'opacity': 0}, 50, '<');
 
     if (best > oldbest) {
-        bestNum.animate({transform: 't0,-'+ 0.4 * bestsize}, 50, '<')
+        bestNum.animate({transform: `t0,-${0.4 * bestsize}`}, 50, '<')
             .animate({'opacity': 0}, 50, '<');
     }
 };
 
 let animateIn = () => {
-    scoreNum.animate({transform: 't0,' + 0.8 * scoresize + 't0,-' + 0.4 * scoresize}, 50, '<')
+    scoreNum.animate({transform: `t0,${0.8 * scoresize}t0,-${0.4 * scoresize}`}, 50, '<')
         .animate({'opacity': 1}, 50, '<');
 
     if (best > oldbest) {
-        bestNum.animate({transform: 't0,' + 0.8 * bestsize + 't0,-' + 0.4 * bestsize}, 50, '<')
+        bestNum.animate({transform: `t0,${0.8 * bestsize}t0,-${0.4 * bestsize}`}, 50, '<')
             .animate({'opacity': 1}, 50, '<');
         oldbest = best;
     }
@@ -120,7 +120,7 @@ let createSquares = () => {
             correct = false;
         }
         let [r, g, b] = hsl2rgb(chosenColor.h, chosenColor.s, chosenColor.l);
-        let rgb = 'rgb('+r+','+g+','+b+')';
+        let rgb = `rgb(${r},${g},${b})`;
         squares.push(genSquare({x: x, y: y}, {x: size, y: size}, rgb, correct));
     });
 };
