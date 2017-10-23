@@ -33,5 +33,10 @@ module.exports = {
     stats: {
         colors: true
     },
-    devtool: 'source-map'
+    devtool: 'source-map',
+    resolve: {
+        alias: {
+            'eve': 'eve-raphael/eve'
+        }
+    }
 };

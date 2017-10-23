@@ -1,4 +1,3 @@
-import eve from 'eve';
 import Raphael from 'raphael';
 
 let paper;
