@@ -52,38 +52,35 @@ let initPoints = () => {
         'text-anchor': 'start',
         'font-family': 'Roboto, sans-serif',
         'opacity': 0
-    })
-        .data('slide', 0.4 * scoresize);
-
-    scoreNum.attr({'transform': 't0,'+2*scoreNum.data('slide')});
+    });
+    scoreNum.attr({'transform': 't0,'+ 0.8 * scoresize});
 
     bestNum = paper.text(scoresize / 4 + bestsize * 2.4, scoresize + bestsize / 1.1 - 0.4 * bestsize, best).attr({
         'font-size': bestsize,
         'text-anchor': 'start',
         'font-family': 'Roboto, sans-serif',
         'opacity': 0
-    })
-        .data('slide', 0.4 * bestsize);
-    bestNum.attr({'transform': 't0,'+2*bestNum.data('slide')});
+    });
+    bestNum.attr({'transform': 't0,'+ 0.8 * bestsize});
     updatePoints();
 };
 
 let animateOut = () => {
-    scoreNum.animate({transform: 't0,-'+scoreNum.data('slide')}, 50, '<')
+    scoreNum.animate({transform: 't0,-'+ 0.4 * scoresize}, 50, '<')
         .animate({'opacity': 0}, 50, '<');
 
     if (best > oldbest) {
-        bestNum.animate({transform: 't0,-'+bestNum.data('slide')}, 50, '<')
+        bestNum.animate({transform: 't0,-'+ 0.4 * bestsize}, 50, '<')
             .animate({'opacity': 0}, 50, '<');
     }
 };
 
 let animateIn = () => {
-    scoreNum.animate({transform: 't0,' + 2*scoreNum.data('slide') + 't0,-' + scoreNum.data('slide')}, 50, '<')
+    scoreNum.animate({transform: 't0,' + 0.8 * scoresize + 't0,-' + 0.4 * scoresize}, 50, '<')
         .animate({'opacity': 1}, 50, '<');
 
     if (best > oldbest) {
-        bestNum.animate({transform: 't0,' + 2*bestNum.data('slide') + 't0,-' + bestNum.data('slide')}, 50, '<')
+        bestNum.animate({transform: 't0,' + 0.8 * bestsize + 't0,-' + 0.4 * bestsize}, 50, '<')
             .animate({'opacity': 1}, 50, '<');
         oldbest = best;
     }
@@ -177,7 +174,7 @@ let genColors = () => {
 
 let clearSquares = () => {
     squares.forEach(square => square.remove());
-    squares.length = 0;
+    squares = [];
 };
 
 let genSquare = (center, size, color, correct) => {
