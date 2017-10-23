@@ -127,17 +127,12 @@ let createSquares = () => {
 
 let getCount = () => {
     let count;
-    if (score < 18) {
-        count = score + 3;
-        if ([7, 11, 13, 17, 19].includes(count)) {
-            count += 1;
-        }
+    if (score >= 14) {
+        return 20;
     }
-    else {
-        count = 20;
-    }
-    if (count == 14) { // I just don't like the way 14 looks
-        count = 15; // Yes, I know hardcoding is evil
+    count = score + 3;
+    while ([7, 11, 13, 14, 17, 18, 19].includes(count)) {
+        count += 1;
     }
     return count;
 };
