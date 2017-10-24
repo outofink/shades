@@ -1,3 +1,6 @@
+import offlinePluginRuntime from 'offline-plugin/runtime';
+offlinePluginRuntime.install();    
+
 import Raphael from 'raphael';
 
 let paper;

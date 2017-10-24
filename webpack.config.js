@@ -1,25 +1,24 @@
 var path = require('path');
-var webpack = require('webpack');
+
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+const OfflinePlugin = require('offline-plugin');
+const UglifyJSPlugin = require('uglifyjs-webpack-plugin');
+
+const html = new HtmlWebpackPlugin({ template: './index.html' });
+const ugly = new UglifyJSPlugin;
+const offline = new OfflinePlugin;
 
 module.exports = {
     entry: './js/game.js',
     output: {
-        path: path.resolve(__dirname, 'build'),
-        filename: 'game.bundle.min.js'
+        path: path.resolve('./build'),
+        filename: '[name].[hash].js'
     },
-    plugins: [
-        new webpack.optimize.UglifyJsPlugin({
-            minimize: true,
-            compress: {
-                warnings: false,
-            },
-            output: {
-                comments: false,
-            }
-        })
-    ],
     module: {
         loaders: [
+            {   test: /\.json$/,
+                loader: 'file-loader'
+            },
             {
                 test: /\.js$/,
                 exclude: /node_modules/,
@@ -30,10 +29,7 @@ module.exports = {
             }
         ]
     },
-    stats: {
-        colors: true
-    },
-    devtool: 'source-map',
+    plugins: [html, ugly, offline],
     resolve: {
         alias: {
             'eve': 'eve-raphael/eve'
