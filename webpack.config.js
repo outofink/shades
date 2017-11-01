@@ -13,17 +13,23 @@ const manifest = new WebpackPwaManifest({
     short_name: 'Shades',
     description: 'If you are color blind, this is not the game for you.',
     background_color: '#ffffff',
+    theme_color: "#ffffff",
     display: "fullscreen",
     orientation: "portrait",
     ios: true,
     icons: [
-      {
-        src: path.resolve('./src/icon.png'),
-        sizes: [192],
-        ios: true     
-      }
+        {
+            src: path.resolve('./src/icons/192.png'),
+            sizes: [192],
+            ios: true     
+        },
+        {
+            src: path.resolve('./src/icons/512.png'),
+            sizes: [512],
+            ios: true     
+        }
     ]
-  })
+})
 
 module.exports = {
     entry: './src/game.js',

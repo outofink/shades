@@ -1,6 +1,13 @@
 import offlinePluginRuntime from 'offline-plugin/runtime';
 offlinePluginRuntime.install();    
 
+import WebFont from 'webfontloader';
+WebFont.load({
+    google: {
+        families: ['Roboto']
+    }
+});
+
 import Raphael from 'raphael';
 
 let paper;
