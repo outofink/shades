@@ -1,5 +1,5 @@
 import offlinePluginRuntime from 'offline-plugin/runtime';
-offlinePluginRuntime.install();    
+offlinePluginRuntime.install();
 
 import WebFont from 'webfontloader';
 WebFont.load({

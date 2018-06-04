@@ -2,11 +2,14 @@ const path = require('path');
 
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const OfflinePlugin = require('offline-plugin');
-const UglifyJSPlugin = require('uglifyjs-webpack-plugin');
 const WebpackPwaManifest = require('webpack-pwa-manifest')
 
-const html = new HtmlWebpackPlugin({ template: './src/index.html' });
-const ugly = new UglifyJSPlugin;
+const html = new HtmlWebpackPlugin({
+    title: "Shades",
+    meta: {
+        viewport: 'width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no'
+    }
+});
 const offline = new OfflinePlugin;
 const manifest = new WebpackPwaManifest({
     name: 'Shades',
@@ -17,42 +20,32 @@ const manifest = new WebpackPwaManifest({
     display: "fullscreen",
     orientation: "portrait",
     ios: true,
-    icons: [
-        {
+    icons: [{
             src: path.resolve('./src/icons/192.png'),
             sizes: [192],
-            ios: true     
+            ios: true
         },
         {
             src: path.resolve('./src/icons/512.png'),
             sizes: [512],
-            ios: true     
+            ios: true
         }
     ]
 })
 
 module.exports = {
+    mode: "development",
     entry: './src/game.js',
     output: {
         path: path.resolve('./build'),
         filename: '[name].[hash].js'
     },
     module: {
-        loaders: [
-            {
-                test: /\.js$/,
-                exclude: /node_modules/,
-                loader: 'babel-loader',
-                query: {
-                    presets: ['babel-preset-env']
-                }
-            }
-        ]
+        rules: [{
+            test: /\.js$/,
+            exclude: /node_modules/,
+            loader: "babel-loader"
+        }]
     },
-    plugins: [html, manifest, ugly, offline],
-    resolve: {
-        alias: {
-            'eve': 'eve-raphael/eve'
-        }
-    }
+    plugins: [html, manifest, offline]
 };
