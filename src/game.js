@@ -187,7 +187,7 @@ let genSquare = (center, size, color, correct) => {
             fill: color,
             'stroke-opacity': 0
         })
-        .touchstart(() => {
+        .mousedown(() => {
             answer(correct);
             updatePoints();
             createSquares();
