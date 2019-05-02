@@ -1,13 +1,6 @@
 import offlinePluginRuntime from 'offline-plugin/runtime';
 offlinePluginRuntime.install();
 
-import WebFont from 'webfontloader';
-WebFont.load({
-    google: {
-        families: ['Roboto']
-    }
-});
-
 let style = document.createElement('style');
 style.innerHTML = 'body { overscroll-behavior: contain;}'
 var ref = document.querySelector('script');
@@ -59,13 +52,13 @@ let initPoints = () => {
     paper.text(scoresize / 4, scoresize + bestsize / 1.1, 'Best:').attr({
         'font-size': bestsize,
         'text-anchor': 'start',
-        'font-family': 'Roboto, sans-serif'
+        'font-family': 'sans-serif'
     });
 
     scoreNum = paper.text(scoresize / 4, scoresize / 1.5 - 0.4 * scoresize, score).attr({
         'font-size': scoresize,
         'text-anchor': 'start',
-        'font-family': 'Roboto, sans-serif',
+        'font-family': 'sans-serif',
         'opacity': 0
     });
     scoreNum.attr({'transform': `t0,${0.8 * scoresize}`});
@@ -73,7 +66,7 @@ let initPoints = () => {
     bestNum = paper.text(scoresize / 4 + bestsize * 2.4, scoresize + bestsize / 1.1 - 0.4 * bestsize, best).attr({
         'font-size': bestsize,
         'text-anchor': 'start',
-        'font-family': 'Roboto, sans-serif',
+        'font-family': 'sans-serif',
         'opacity': 0
     });
     bestNum.attr({'transform': `t0,${0.8 * bestsize}`});

@@ -32,7 +32,6 @@
   },
   "dependencies": {
     "offline-plugin": "^5.0.6",
-    "raphael": "^2.2.8",
-    "webfontloader": "^1.6.28"
+    "raphael": "^2.2.8"
   }
 }
