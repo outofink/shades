@@ -129,8 +129,7 @@ let createSquares = () => {
             chosenColor = color;
             correct = false;
         }
-        let [r, g, b] = hsl2rgb(chosenColor.h, chosenColor.s, chosenColor.l);
-        let rgb = `rgb(${r},${g},${b})`;
+        let rgb = Raphael.hsl(chosenColor.h, chosenColor.s, chosenColor.l);
         squares.push(genSquare({x: x, y: y}, {x: size, y: size}, rgb, correct));
     });
 };
@@ -216,46 +215,6 @@ let getOtherColor = (color, colorOffset) => {
         l: offsetL
     };
     return otherColor;
-};
-
-let hsl2rgb = (h, s, l) => {
-    let m1, m2, hue;
-    let r, g, b;
-    s /= 100;
-    l /= 100;
-    if (s == 0)
-        r = g = b = (l * 255);
-    else {
-        if (l <= 0.5)
-            m2 = l * (s + 1);
-        else
-            m2 = l + s - l * s;
-        m1 = l * 2 - m2;
-        hue = h / 360;
-        r = Math.round(HueToRgb(m1, m2, hue + 1/3));
-        g = Math.round(HueToRgb(m1, m2, hue));
-        b = Math.round(HueToRgb(m1, m2, hue - 1/3));
-    }
-    return [r, g, b];
-};
-
-let HueToRgb = (m1, m2, hue) => {
-    let v;
-    if (hue < 0)
-        hue += 1;
-    else if (hue > 1)
-        hue -= 1;
-
-    if (6 * hue < 1)
-        v = m1 + (m2 - m1) * hue * 6;
-    else if (2 * hue < 1)
-        v = m2;
-    else if (3 * hue < 2)
-        v = m1 + (m2 - m1) * (2/3 - hue) * 6;
-    else
-        v = m1;
-
-    return 255 * v;
 };
 
 let getGrid = count => {
