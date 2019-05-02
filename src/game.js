@@ -8,6 +8,11 @@ WebFont.load({
     }
 });
 
+let style = document.createElement('style');
+style.innerHTML = 'body { overscroll-behavior: contain;}'
+var ref = document.querySelector('script');
+ref.parentNode.insertBefore(style, ref);
+
 import Raphael from 'raphael';
 
 let paper;
