@@ -1,16 +1,19 @@
 const path = require('path');
 
+const CleanWebpackPlugin = require('clean-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const OfflinePlugin = require('offline-plugin');
-const WebpackPwaManifest = require('webpack-pwa-manifest')
+const WebpackPwaManifest = require('webpack-pwa-manifest');
 
+const clean = new CleanWebpackPlugin();
 const html = new HtmlWebpackPlugin({
     title: "Shades",
     meta: {
         viewport: 'width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no'
-    }
+    },
+    minify: true
 });
-const offline = new OfflinePlugin;
+const offline = new OfflinePlugin({minify: true});
 const manifest = new WebpackPwaManifest({
     name: 'Shades',
     short_name: 'Shades',
@@ -48,5 +51,5 @@ module.exports = {
             loader: "babel-loader"
         }]
     },
-    plugins: [html, offline, manifest]
+    plugins: [clean, html, offline, manifest]
 };
