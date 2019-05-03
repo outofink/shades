@@ -10,8 +10,7 @@ const html = new HtmlWebpackPlugin({
     title: "Shades",
     meta: {
         viewport: 'width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no'
-    },
-    minify: true
+    }
 });
 const offline = new OfflinePlugin({minify: true});
 const manifest = new WebpackPwaManifest({
@@ -35,7 +34,7 @@ const manifest = new WebpackPwaManifest({
             destination: path.join('icons', 'android')
           }
     ]
-})
+});
 
 module.exports = {
     mode: "development",

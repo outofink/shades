@@ -2,7 +2,7 @@ import offlinePluginRuntime from 'offline-plugin/runtime';
 offlinePluginRuntime.install();
 
 let style = document.createElement('style');
-style.innerHTML = 'body { overscroll-behavior: contain;}'
+style.innerHTML = 'body { overscroll-behavior: contain;}';
 var ref = document.querySelector('script');
 ref.parentNode.insertBefore(style, ref);
 
@@ -63,7 +63,7 @@ let initPoints = () => {
     });
     scoreNum.attr({'transform': `t0,${0.8 * scoresize}`});
 
-    bestNum = paper.text(scoresize / 4 + bestsize * 2.4, scoresize + bestsize / 1.1 - 0.4 * bestsize, best).attr({
+    bestNum = paper.text(scoresize / 4 + bestsize * 2.34, scoresize + bestsize / 1.1 - 0.4 * bestsize, best).attr({
         'font-size': bestsize,
         'text-anchor': 'start',
         'font-family': 'sans-serif',
