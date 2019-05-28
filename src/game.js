@@ -23,6 +23,9 @@ let bestNum;
 
 let squares = [];
 
+// check if using iOS
+const iOS = !!navigator.platform && /iPad|iPhone|iPod/.test(navigator.platform);
+
 // text sizes
 const scoresize = H / 13.33;
 const bestsize = (scoresize * 3) / 7;
@@ -185,11 +188,20 @@ let genSquare = (center, size, color, correct) => {
             fill: color,
             'stroke-opacity': 0
         })
-        .mousedown(() => {
-            answer(correct);
-            updatePoints();
-            createSquares();
-        });
+        if (iOS) {
+            rect.touchstart(() => {
+                answer(correct);
+                updatePoints();
+                createSquares();
+            });
+        }
+        else {
+            rect.mousedown(() => {
+                answer(correct);
+                updatePoints();
+                createSquares();
+            });
+        }
     return rect;
 };
 
