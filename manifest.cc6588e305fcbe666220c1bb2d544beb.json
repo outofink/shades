@@ -1,0 +1,72 @@
+{
+  "icons": [
+    {
+      "src": "icons/android/icon_512x512.21c268aca208ecb220badd5c0a698b3a.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    },
+    {
+      "src": "icons/android/icon_192x192.516c71dcf38e4b592c9b387954201e37.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icons/android/icon_144x144.05998c9e5c456011d6bf1626f1d91f23.png",
+      "sizes": "144x144",
+      "type": "image/png"
+    },
+    {
+      "src": "icons/android/icon_96x96.dcdfa7c99d78925e88112a1b251a18c9.png",
+      "sizes": "96x96",
+      "type": "image/png"
+    },
+    {
+      "src": "icons/android/icon_72x72.ee8d8948fbed2a652edf1214740eb01d.png",
+      "sizes": "72x72",
+      "type": "image/png"
+    },
+    {
+      "src": "icons/android/icon_48x48.f5db25c96e7198989996f6e99761f194.png",
+      "sizes": "48x48",
+      "type": "image/png"
+    },
+    {
+      "src": "icons/android/icon_36x36.0c4a7ff01dad450b36fcc2816c44e21c.png",
+      "sizes": "36x36",
+      "type": "image/png"
+    },
+    {
+      "src": "icons/ios/icon_1024x1024.3f9e030a76b34dabfee7c58a2607b618.png",
+      "sizes": "1024x1024",
+      "type": "image/png"
+    },
+    {
+      "src": "icons/ios/icon_180x180.d2bcf6fa0a0659a331138c39b62a97d8.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    },
+    {
+      "src": "icons/ios/icon_167x167.4dc9b05393fe738230e498fc8b06153f.png",
+      "sizes": "167x167",
+      "type": "image/png"
+    },
+    {
+      "src": "icons/ios/icon_152x152.6f8946b84f104e5351e96d898be213e2.png",
+      "sizes": "152x152",
+      "type": "image/png"
+    },
+    {
+      "src": "icons/ios/icon_120x120.232999741a54335af4f814b90d15e007.png",
+      "sizes": "120x120",
+      "type": "image/png"
+    }
+  ],
+  "name": "Shades",
+  "short_name": "Shades",
+  "orientation": "portrait",
+  "display": "standalone",
+  "start_url": ".",
+  "description": "If you are color blind, this is not the game for you.",
+  "background_color": "#ffffff",
+  "theme_color": "#ffffff"
+}
