@@ -8,6 +8,7 @@ const WebpackPwaManifest = require('webpack-pwa-manifest');
 const clean = new CleanWebpackPlugin();
 const html = new HtmlWebpackPlugin({
     title: 'Shades',
+    favicon: './src/icons/icon.png',
     meta: {
         viewport: 'width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no',
     },
