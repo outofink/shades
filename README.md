@@ -11,3 +11,11 @@ If you are color blind, this isn't the game for you.
 <br>
 
 ![](https://github.com/outofink/shades/raw/master/screenshots/main.png)
+
+## Built With
+
+* [Raphaël.js](https://dmitrybaranovskiy.github.io/raphael/) - JavaScript Graphics Library
+
+## License
+
+[MIT](https://github.com/outofink/shades/raw/master/LICENSE.md)
