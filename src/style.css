@@ -45,6 +45,7 @@ body {
     width: min(19vh, 19vw);
     height: min(19vh, 19vw);
     background: var(--color);
+    border-radius: min(1.5vh, 1.5vw);
 }
 
 .different {
