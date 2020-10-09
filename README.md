@@ -10,12 +10,11 @@
 
 <br>
 
-![](https://github.com/outofink/shades/raw/master/screenshots/main1.png)
-
-![](https://github.com/outofink/shades/raw/master/screenshots/main2.png)
-
-![](https://github.com/outofink/shades/raw/master/screenshots/main3.png)
-
+<p align="middle" style="padding:4em">
+    <img src="https://github.com/outofink/shades/raw/master/screenshots/main1.png" width=250 />
+    <img src="https://github.com/outofink/shades/raw/master/screenshots/main2.png" width=250 />
+    <img src="https://github.com/outofink/shades/raw/master/screenshots/main3.png" width=250 />
+</p>
 ## License
 
 [MIT](https://github.com/outofink/shades/raw/master/LICENSE.md)
