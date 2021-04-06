@@ -38,7 +38,7 @@ const manifest = new WebpackPwaManifest({
   {
     src: path.resolve('./src/icons/maskable_icon.png'),
     sizes: [36, 48, 72, 96, 144, 192, 512],
-    destination: path.join('icons', 'android'),
+    destination: path.join('icons', 'maskable'),
     purpose: 'maskable',
   },
   ],
