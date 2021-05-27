@@ -2,7 +2,7 @@ const path = require('path');
 
 const {CleanWebpackPlugin} = require('clean-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const OfflinePlugin = require('offline-plugin');
+const WorkboxPlugin = require('workbox-webpack-plugin');
 const WebpackPwaManifest = require('webpack-pwa-manifest');
 
 const clean = new CleanWebpackPlugin();
@@ -14,8 +14,12 @@ const html = new HtmlWebpackPlugin({
   },
   template: './src/index.html',
 });
-const offline = new OfflinePlugin({minify: true});
+const workbox = new WorkboxPlugin.GenerateSW({
+  clientsClaim: true,
+  skipWaiting: true,
+});
 const manifest = new WebpackPwaManifest({
+  publicPath: '.',
   name: 'Shades',
   short_name: 'Shades',
   description: 'If you are color blind, this is not the game for you.',
@@ -45,11 +49,12 @@ const manifest = new WebpackPwaManifest({
 });
 
 module.exports = {
+  target: 'browserslist:last 2 Chrome versions, iOS 14',
   mode: 'development',
   entry: './src/game.js',
   output: {
-    path: path.resolve('./build'),
-    filename: '[name].[hash].js',
+    path: path.resolve('./dist'),
+    filename: '[name].[contenthash].js',
   },
   module: {
     rules: [{
@@ -62,5 +67,5 @@ module.exports = {
       use: ['style-loader', 'css-loader'],
     },
     ]},
-  plugins: [clean, html, offline, manifest],
+  plugins: [clean, html, workbox, manifest],
 };
