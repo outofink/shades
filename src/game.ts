@@ -11,14 +11,14 @@ if ('serviceWorker' in navigator) {
 import './style.css';
 
 let score = 0;
-let best = localStorage.getItem('best') || 0;
+let best = parseInt(localStorage.getItem('best') || '') || 0;
 let oldbest = best - 1;
 
 // on-screen elements
-const scoreNum = document.getElementById('score');
-const bestNum = document.getElementById('best-score');
-const grid = document.getElementById('grid');
-const root = document.documentElement;
+const scoreNum = document.getElementById('score') as HTMLParagraphElement;
+const bestNum = document.getElementById('best-score') as HTMLParagraphElement;
+const grid = document.getElementById('grid') as HTMLParagraphElement;
+const root = document.documentElement as HTMLParagraphElement;
 
 // remove animatation style after the animation is complete
 bestNum.onanimationend = () => {
@@ -39,12 +39,12 @@ const startingOffset = 150;
 // rate of increasing difficulty (lower is harder)
 const difficultySpeed = 0.97;
 
-function init() {
+function init() : void {
   updatePoints();
   createSquares();
 };
 
-function updatePoints() {
+function updatePoints() : void {
   root.style.setProperty('--new', `"${score}"`);
   scoreNum.classList.add('animate');
 
@@ -54,7 +54,7 @@ function updatePoints() {
   }
 };
 
-function createSquares() {
+function createSquares() : void {
   const count = getCount();
   const dimensions = getGridDimensions(count);
 
@@ -63,8 +63,8 @@ function createSquares() {
 
   clearSquares();
 
-  root.style.setProperty('--x', dimensions.x);
-  root.style.setProperty('--y', dimensions.y);
+  root.style.setProperty('--x', dimensions.x.toString());
+  root.style.setProperty('--y', dimensions.y.toString());
 
   root.style.setProperty('--color', color);
   root.style.setProperty('--different', otherColor);
@@ -86,9 +86,10 @@ function createSquares() {
   }
 };
 
-function handleClick(evt) {
+function handleClick(evt: Event) : void {
   evt.preventDefault();
-  const correct = evt.target.classList[1];
+  const target = evt.target as HTMLDivElement;
+  const correct = target.classList[1];
 
   if (!correct) {
     score = 0;
@@ -96,14 +97,14 @@ function handleClick(evt) {
     score++;
     if (score > best) {
       best++;
-      localStorage.setItem('best', best);
+      localStorage.setItem('best', best.toString());
     }
   }
   updatePoints();
   createSquares();
 };
 
-function getCount() {
+function getCount() : number {
   let count;
   if (score >= 14) {
     return 20;
@@ -115,7 +116,7 @@ function getCount() {
   return count;
 };
 
-function getGridDimensions(count) {
+function getGridDimensions(count: number) : {x: number, y: number} {
   let k = 1;
   let j = count;
   for (const number of [2, 3, 4]) {
@@ -129,10 +130,16 @@ function getGridDimensions(count) {
   return {x: k, y: j};
 };
 
-function genColors() {
+type Color = {
+  h: number;
+  s: number;
+  l: number
+};
+
+function genColors() : [string, string] {
   const colorOffset = Math.ceil(startingOffset * Math.pow(difficultySpeed, score));
 
-  const color = {
+  const color : Color = {
     h: Math.floor(Math.random() * 360),
     s: 100 - Math.floor(Math.random() * (colorOffset/startingOffset) * 50),
     l: Math.random() < 0.5 ?
@@ -148,7 +155,7 @@ function genColors() {
   ];
 };
 
-function getOtherColor(color, colorOffset) {
+function getOtherColor(color : Color, colorOffset : number) : Color {
   const offsetL = Math.random() < 0.5 ? color.l + colorOffset/5: color.l - colorOffset/5;
   const otherColor = {
     h: color.h,
@@ -158,9 +165,9 @@ function getOtherColor(color, colorOffset) {
   return otherColor;
 };
 
-function clearSquares() {
+function clearSquares() : void {
   while (grid.firstChild) {
-    grid.removeChild(grid.lastChild);
+    grid.removeChild(grid.lastChild as Node);
   }
 };
 

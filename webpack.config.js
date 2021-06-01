@@ -51,16 +51,16 @@ const manifest = new WebpackPwaManifest({
 module.exports = {
   target: 'browserslist:last 2 Chrome versions, iOS 14',
   mode: 'development',
-  entry: './src/game.js',
+  entry: './src/game.ts',
   output: {
     path: path.resolve('./dist'),
     filename: '[name].[contenthash].js',
   },
   module: {
     rules: [{
-      test: /\.js$/,
+      test: /\.ts$/,
       exclude: /node_modules/,
-      loader: 'babel-loader',
+      loader: 'ts-loader',
     },
     {
       test: /\.css$/i,
