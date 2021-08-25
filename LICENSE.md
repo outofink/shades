@@ -1,6 +1,6 @@
 MIT License
 
-Copyright (c) 2019 Out of Ink Software
+Copyright (c) 2021 Moshe Krumbein (outofink)
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
