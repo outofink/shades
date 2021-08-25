@@ -1,24 +1,27 @@
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('service-worker.js').then((registration) => {
-      console.log('SW registered: ', registration);
-    }).catch((registrationError) => {
-      console.log('SW registration failed: ', registrationError);
-    });
+    navigator.serviceWorker
+      .register('service-worker.js')
+      .then((registration) => {
+        console.log('SW registered: ', registration);
+      })
+      .catch((registrationError) => {
+        console.log('SW registration failed: ', registrationError);
+      });
   });
 }
 
 import './style.css';
 
 let score = 0;
-let best = parseInt(localStorage.getItem('best') || '') || 0;
+let best = parseInt(localStorage.getItem('best') || '0');
 let oldbest = best - 1;
 
 // on-screen elements
 const scoreNum = document.getElementById('score') as HTMLParagraphElement;
 const bestNum = document.getElementById('best-score') as HTMLParagraphElement;
-const grid = document.getElementById('grid') as HTMLParagraphElement;
-const root = document.documentElement as HTMLParagraphElement;
+const grid = document.getElementById('grid') as HTMLDivElement;
+const root = document.documentElement as HTMLElement;
 
 // remove animatation style after the animation is complete
 bestNum.onanimationend = () => {
@@ -39,12 +42,12 @@ const startingOffset = 150;
 // rate of increasing difficulty (lower is harder)
 const difficultySpeed = 0.97;
 
-function init() : void {
+function init(): void {
   updatePoints();
   createSquares();
-};
+}
 
-function updatePoints() : void {
+function updatePoints(): void {
   root.style.setProperty('--new', `"${score}"`);
   scoreNum.classList.add('animate');
 
@@ -52,9 +55,9 @@ function updatePoints() : void {
     root.style.setProperty('--new-best', `"${best}"`);
     bestNum.classList.add('best-animate');
   }
-};
+}
 
-function createSquares() : void {
+function createSquares(): void {
   const count = getCount();
   const dimensions = getGridDimensions(count);
 
@@ -84,9 +87,9 @@ function createSquares() : void {
     }
     grid.appendChild(block);
   }
-};
+}
 
-function handleClick(evt: Event) : void {
+function handleClick(evt: Event): void {
   evt.preventDefault();
   const target = evt.target as HTMLDivElement;
   const correct = target.classList[1];
@@ -102,9 +105,9 @@ function handleClick(evt: Event) : void {
   }
   updatePoints();
   createSquares();
-};
+}
 
-function getCount() : number {
+function getCount(): number {
   let count;
   if (score >= 14) {
     return 20;
@@ -114,9 +117,9 @@ function getCount() : number {
     count += 1;
   }
   return count;
-};
+}
 
-function getGridDimensions(count: number) : {x: number, y: number} {
+function getGridDimensions(count: number): { x: number; y: number } {
   let k = 1;
   let j = count;
   for (const number of [2, 3, 4]) {
@@ -127,24 +130,25 @@ function getGridDimensions(count: number) : {x: number, y: number} {
   }
   [k, j] = [k, j].sort();
 
-  return {x: k, y: j};
-};
+  return { x: k, y: j };
+}
 
 type Color = {
   h: number;
   s: number;
-  l: number
+  l: number;
 };
 
-function genColors() : [string, string] {
+function genColors(): [string, string] {
   const colorOffset = Math.ceil(startingOffset * Math.pow(difficultySpeed, score));
 
-  const color : Color = {
+  const color: Color = {
     h: Math.floor(Math.random() * 360),
-    s: 100 - Math.floor(Math.random() * (colorOffset/startingOffset) * 50),
-    l: Math.random() < 0.5 ?
-      50 - Math.floor((Math.random() * 25) / Math.sqrt(colorOffset)) :
-      50 + Math.floor((Math.random() * 25) / Math.sqrt(colorOffset)),
+    s: 100 - Math.floor(Math.random() * (colorOffset / startingOffset) * 50),
+    l:
+      Math.random() < 0.5
+        ? 50 - Math.floor((Math.random() * 25) / Math.sqrt(colorOffset))
+        : 50 + Math.floor((Math.random() * 25) / Math.sqrt(colorOffset)),
   };
 
   const otherColor = getOtherColor(color, colorOffset);
@@ -153,22 +157,22 @@ function genColors() : [string, string] {
     `hsl(${color.h},${color.s}%,${color.l}%)`,
     `hsl(${otherColor.h},${otherColor.s}%,${otherColor.l}%)`,
   ];
-};
+}
 
-function getOtherColor(color : Color, colorOffset : number) : Color {
-  const offsetL = Math.random() < 0.5 ? color.l + colorOffset/5: color.l - colorOffset/5;
+function getOtherColor(color: Color, colorOffset: number): Color {
+  const offsetL = Math.random() < 0.5 ? color.l + colorOffset / 5 : color.l - colorOffset / 5;
   const otherColor = {
     h: color.h,
     s: color.s,
     l: offsetL,
   };
   return otherColor;
-};
+}
 
-function clearSquares() : void {
+function clearSquares(): void {
   while (grid.firstChild) {
     grid.removeChild(grid.lastChild as Node);
   }
-};
+}
 
 window.onload = () => init();
