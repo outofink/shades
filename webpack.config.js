@@ -5,6 +5,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const WorkboxPlugin = require('workbox-webpack-plugin');
 const WebpackPwaManifest = require('webpack-pwa-manifest');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
 
 const minicss = new MiniCssExtractPlugin({
   filename: '[name].[contenthash].css',
@@ -75,4 +76,7 @@ module.exports = {
     ],
   },
   plugins: [clean, html, minicss, workbox, manifest],
+  optimization: {
+    minimizer: [`...`, new CssMinimizerPlugin()],
+  },
 };
