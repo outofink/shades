@@ -13,11 +13,11 @@ const minicss = new MiniCssExtractPlugin({
 });
 const clean = new CleanWebpackPlugin();
 const html = new HtmlWebpackPlugin({
-  favicon: './src/icons/icon.png',
+  favicon: './static/icons/icon.png',
   meta: {
     viewport: 'width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no',
   },
-  template: './src/index.html',
+  template: './static/index.html',
 });
 const workbox = new WorkboxPlugin.GenerateSW({
   clientsClaim: true,
@@ -35,18 +35,18 @@ const manifest = new WebpackPwaManifest({
   ios: true,
   icons: [
     {
-      src: path.resolve('./src/icons/icon.png'),
+      src: path.resolve('./static/icons/icon.png'),
       sizes: [120, 152, 167, 180, 1024],
       destination: path.join('icons', 'ios'),
       ios: true,
     },
     {
-      src: path.resolve('./src/icons/icon.png'),
+      src: path.resolve('./static/icons/icon.png'),
       sizes: [36, 48, 72, 96, 144, 192, 512],
       destination: path.join('icons', 'android'),
     },
     {
-      src: path.resolve('./src/icons/maskable_icon.png'),
+      src: path.resolve('./static/icons/maskable_icon.png'),
       sizes: [36, 48, 72, 96, 144, 192, 512],
       destination: path.join('icons', 'maskable'),
       purpose: 'maskable',
@@ -57,7 +57,10 @@ const manifest = new WebpackPwaManifest({
 module.exports = {
   target: 'browserslist:last 2 Chrome versions, iOS 14',
   mode: 'development',
-  entry: './src/game.ts',
+  entry: './src/main.ts',
+  resolve: {
+    extensions: ['.ts'],
+  },
   output: {
     path: path.resolve('./dist'),
     filename: '[name].[contenthash].js',
