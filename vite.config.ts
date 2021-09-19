@@ -1,6 +1,7 @@
 import { VitePWA } from 'vite-plugin-pwa';
 
 export default {
+  base: '/shades/',
   plugins: [
     VitePWA({
       registerType: 'autoUpdate',
