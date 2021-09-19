@@ -1,6 +1,6 @@
 import { Game } from './Game';
 
-import '.style.css';
+import './style.css';
 
 export class GameView {
   private root: HTMLElement;
