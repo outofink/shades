@@ -78,7 +78,7 @@ export class GameView {
   }
 
   private getHandlerType(): string {
-    const iOS = /iPad|iPhone|iPod/.test(navigator.platform);
+    const iOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
     return iOS ? 'touchstart' : 'click';
   }
 
