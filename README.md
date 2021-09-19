@@ -1,5 +1,5 @@
 <p align="center">
-<img src="https://github.com/outofink/shades/raw/master/static/icons/icon.png" width=192>
+<img src="https://github.com/outofink/shades/raw/master/public/favicon.svg" width=192>
 </p>
 
 <h1 align="center">shades</h1>
