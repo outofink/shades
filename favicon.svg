@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg" version="1.0" width="720pt" height="720pt" viewBox="0 0 720 720" preserveAspectRatio="xMidYMid meet">
+  <rect id="rect1" width="300" height="300" x="40" y="40" rx="30" ry="30" fill="#b831ff" />
+  <rect id="rect2" width="300" height="300" x="380" y="40" rx="30" ry="30" fill="#7800b5" />
+  <rect id="rect3" width="300" height="300" x="40" y="380" rx="30" ry="30" fill="#7800b5" />
+  <rect id="rect4" width="300" height="300" x="380" y="380" rx="30" ry="30" fill="#7800b5" />
+</svg>
