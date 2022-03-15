@@ -14,11 +14,10 @@ export class Game {
     this._score = 0;
     this._best = this.localStore.best;
     this.gameView = new GameView();
-    this.board = new Board(this.score);
+    this.board = new Board();
   }
 
   public start() {
-    this.board.generateBoard(this.score);
     this.gameView.updateScore(this.score);
     this.gameView.updateBest(this.best);
     this.gameView.renderBoard(this.board);

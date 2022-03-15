@@ -11,8 +11,11 @@ export class Board {
   private _chosen: number;
   private _dimensions: Dimensions;
 
-  constructor(score: number) {
-    [this._colors, this._numberOfSquares, this._chosen, this._dimensions] = this.generateBoard(score);
+  constructor() {
+    this._colors = new Colors(0);
+    this._numberOfSquares = this.getNumberOfSquares(0);
+    this._chosen = this.getChosen(this.numberOfSquares);
+    this._dimensions = this.getBoardDimensions(this.numberOfSquares);
   }
 
   private getBoardDimensions(numberOfSquares: number): Dimensions {
@@ -48,8 +51,6 @@ export class Board {
     this._numberOfSquares = this.getNumberOfSquares(score);
     this._chosen = this.getChosen(this.numberOfSquares);
     this._dimensions = this.getBoardDimensions(this.numberOfSquares);
-
-    return [this._colors, this.numberOfSquares, this.chosen, this._dimensions] as const;
   }
 
   public get color(): Color {
