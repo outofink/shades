@@ -1,4 +1,3 @@
-import { Game } from './Game';
 import { Color, Colors } from './Colors';
 
 type Dimensions = {
@@ -7,13 +6,13 @@ type Dimensions = {
 };
 
 export class Board {
-  private colors: Colors;
+  private _colors: Colors;
   private _numberOfSquares: number;
   private _chosen: number;
-  private dimensions: Dimensions;
+  private _dimensions: Dimensions;
 
-  constructor(game: Game) {
-    [this.colors, this._numberOfSquares, this._chosen, this.dimensions] = this.generateBoard(game);
+  constructor(score: number) {
+    [this._colors, this._numberOfSquares, this._chosen, this._dimensions] = this.generateBoard(score);
   }
 
   private getBoardDimensions(numberOfSquares: number): Dimensions {
@@ -34,30 +33,30 @@ export class Board {
     return Math.floor(Math.random() * numberOfSquares);
   }
 
-  private getNumberOfSquares(game: Game): number {
-    if (game.score >= 14) return 20;
+  private getNumberOfSquares(score: number): number {
+    if (score >= 14) return 20;
 
-    let number = game.score + 3;
+    let number = score + 3;
     while ([7, 11, 13, 14, 17, 18, 19].includes(number)) {
       number += 1;
     }
     return number;
   }
 
-  public generateBoard(game: Game) {
-    this.colors = new Colors(game);
-    this._numberOfSquares = this.getNumberOfSquares(game);
-    this._chosen = this.getChosen(this._numberOfSquares);
-    this.dimensions = this.getBoardDimensions(this._numberOfSquares);
+  public generateBoard(score: number) {
+    this._colors = new Colors(score);
+    this._numberOfSquares = this.getNumberOfSquares(score);
+    this._chosen = this.getChosen(this.numberOfSquares);
+    this._dimensions = this.getBoardDimensions(this.numberOfSquares);
 
-    return [this.colors, this._numberOfSquares, this._chosen, this.dimensions] as const;
+    return [this._colors, this.numberOfSquares, this.chosen, this._dimensions] as const;
   }
 
   public get color(): Color {
-    return this.colors.color;
+    return this._colors.color;
   }
   public get otherColor(): Color {
-    return this.colors.otherColor;
+    return this._colors.otherColor;
   }
 
   public get chosen(): number {
@@ -69,9 +68,9 @@ export class Board {
   }
 
   public get x(): number {
-    return this.dimensions.x;
+    return this._dimensions.x;
   }
   public get y(): number {
-    return this.dimensions.y;
+    return this._dimensions.y;
   }
 }

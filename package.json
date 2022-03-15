@@ -1,6 +1,6 @@
 {
   "name": "shades",
-  "version": "5.0.0",
+  "version": "5.1.0",
   "description": "If you are color blind, this isn't the game for you.",
   "scripts": {
     "dev": "vite",
@@ -9,9 +9,9 @@
   },
   "homepage": "https://outofink.github.io/shades/",
   "devDependencies": {
-    "prettier": "^2.4.1",
-    "typescript": "^4.3.2",
-    "vite": "^2.5.4",
-    "vite-plugin-pwa": "^0.11.2"
+    "prettier": "^2.5.1",
+    "typescript": "^4.6.2",
+    "vite": "^2.8.6",
+    "vite-plugin-pwa": "^0.11.13"
   }
 }

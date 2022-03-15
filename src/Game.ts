@@ -5,7 +5,6 @@ import { Board } from './Board';
 export class Game {
   private _score: number;
   private _best: number;
-  private _oldBest: number;
   private gameView: GameView;
   private localStore: LocalStore;
   board: Board;
@@ -14,16 +13,41 @@ export class Game {
     this.localStore = new LocalStore();
     this._score = 0;
     this._best = this.localStore.best;
-    this._oldBest = this._best - 1;
-    this.gameView = new GameView(this);
-    this.board = new Board(this);
+    this.gameView = new GameView();
+    this.board = new Board(this.score);
   }
 
   public start() {
-    this.board.generateBoard(this);
-    this.gameView.updateScore(this);
-    this.gameView.updateBest(this);
-    this.gameView.renderBoard(this);
+    this.board.generateBoard(this.score);
+    this.gameView.updateScore(this.score);
+    this.gameView.updateBest(this.best);
+    this.gameView.renderBoard(this.board);
+    this.addEventListeners();
+  }
+
+  private addEventListeners() {
+    const squares = document.getElementById('grid')?.childNodes as NodeListOf<HTMLDivElement>;
+
+    squares.forEach(square =>
+      square.addEventListener(
+        this.gameView.getHandlerType(),
+        (e) => {
+          e.preventDefault();
+          const target = e.target as HTMLDivElement;
+          const correct = target.classList[1];
+
+          if (!correct) {
+            this.score = 0;
+          } else {
+            this.score += 1;
+            if (this.score > this.best) {
+              this.best += 1;
+            }
+          }
+        },
+        false
+      )
+    );
   }
 
   public get best(): number {
@@ -33,7 +57,7 @@ export class Game {
   public set best(value: number) {
     this._best = value;
     this.localStore.best = value;
-    this.gameView.updateBest(this);
+    this.gameView.updateBest(this.best);
   }
 
   public get score(): number {
@@ -42,16 +66,9 @@ export class Game {
 
   public set score(value: number) {
     this._score = value;
-    this.board.generateBoard(this);
-    this.gameView.updateScore(this);
-    this.gameView.renderBoard(this);
-  }
-
-  public get oldBest(): number {
-    return this._oldBest;
-  }
-
-  public set oldBest(value: number) {
-    this._oldBest = value;
+    this.board.generateBoard(this.score);
+    this.gameView.updateScore(this.score);
+    this.gameView.renderBoard(this.board);
+    this.addEventListeners();
   }
 }

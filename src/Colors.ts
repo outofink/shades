@@ -1,4 +1,3 @@
-import { Game } from './Game';
 import { STARTING_OFFSET, RATE_OF_DIFFICULTY } from './settings';
 
 export class Color {
@@ -20,11 +19,11 @@ export class Color {
 export class Colors {
   color: Color;
   otherColor: Color;
-  constructor(game: Game) {
-    [this.color, this.otherColor] = this.genColors(game);
+  constructor(score: number) {
+    [this.color, this.otherColor] = this.genColors(score);
   }
-  private genColors(game: Game): [Color, Color] {
-    const colorOffset = Math.ceil(STARTING_OFFSET * Math.pow(RATE_OF_DIFFICULTY, game.score));
+  private genColors(score: number): [Color, Color] {
+    const colorOffset = Math.ceil(STARTING_OFFSET * Math.pow(RATE_OF_DIFFICULTY, score));
 
     const color = new Color(
       Math.floor(Math.random() * 360),
