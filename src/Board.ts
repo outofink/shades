@@ -1,4 +1,4 @@
-import { Color, Colors } from './Colors';
+import { ColorLAB, Colors } from './Colors';
 
 type Dimensions = {
   x: number;
@@ -53,10 +53,10 @@ export class Board {
     this._dimensions = this.getBoardDimensions(this.numberOfSquares);
   }
 
-  public get color(): Color {
+  public get color(): ColorLAB {
     return this._colors.color;
   }
-  public get otherColor(): Color {
+  public get otherColor(): ColorLAB {
     return this._colors.otherColor;
   }
 
