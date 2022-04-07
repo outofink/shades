@@ -40,16 +40,25 @@ export class ColorLAB {
     let yr = color.l > k * e ? Math.pow((color.l + 16) / 116, 3) : color.l / k;
     let zr = fz ** 3 > e ? fz ** 3 : (116 * fz - 16) / k;
 
-    return { x: xr * 95.047, y: yr * 100, z: zr * 108.883 };
+    return { x: xr * 0.95047, y: yr, z: zr * 1.08883 };
   }
 
   private XYZToRGB(color: ColorXYZ): ColorRGB {
-    // Best RGB 
+    // Best RGB
     let r = color.x * 1.7552599 + color.y * -0.4836786 + color.z * -0.2530000;
     let g = color.x * -0.5441336 + color.y * 1.5068789 + color.z * 0.0215528;
     let b = color.x * 0.0063467 + color.y * -0.0175761 + color.z * 1.2256959;
-
-    return { r: Math.floor(r), g: Math.floor(g), b: Math.floor(b) }
+    let rgb = [r,g,b]
+    rgb.forEach((color, i) => {
+      if (color > 0.0031308) {
+        color = 1.055 * Math.pow(color, 1 / 2.4) - 0.055;
+      }
+      else {
+        color *= 12.92;
+      }
+      rgb[i] = Math.floor(color * 255)
+    });
+    return { r: rgb[0], g: rgb[1], b: rgb[2] };
   }
 }
 
@@ -61,16 +70,12 @@ export class Colors {
   }
   private genColors(score: number): [ColorLAB, ColorLAB] {
     const colorOffset = Math.ceil(STARTING_OFFSET * Math.pow(RATE_OF_DIFFICULTY, score));
-    console.log("colorOffset: " + colorOffset);
-    let color, otherColor;
-    do {
-      color = new ColorLAB(
-        Math.floor(Math.random() * 25) + 75,
-        Math.floor(Math.random() * 100) - 50,
-        Math.floor(Math.random() * 100) - 50
-      );
-      otherColor = this.getOtherColor(color, colorOffset);
-    } while (color.toCSS().includes("-") || otherColor.toCSS().includes("-"));
+    let color = new ColorLAB(
+      Math.floor(Math.random() * 25) + 50,
+      Math.floor(Math.random() * 100) - 50,
+      Math.floor(Math.random() * 100) - 50
+    );
+    let otherColor = this.getOtherColor(color, colorOffset);
 
     return [color, otherColor];
   }
