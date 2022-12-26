@@ -27,7 +27,7 @@ export class Game {
   private addEventListeners() {
     const squares = document.getElementById('grid')?.childNodes as NodeListOf<HTMLDivElement>;
 
-    squares.forEach(square =>
+    squares.forEach((square) =>
       square.addEventListener(
         this.gameView.getHandlerType(),
         (e) => {

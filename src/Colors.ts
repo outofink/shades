@@ -1,4 +1,4 @@
-import { STARTING_OFFSET, RATE_OF_DIFFICULTY } from './settings';
+import { RATE_OF_DIFFICULTY, STARTING_OFFSET } from './settings';
 
 interface ColorXYZ {
   x: number;
@@ -45,18 +45,17 @@ export class ColorLAB {
 
   private XYZToRGB(color: ColorXYZ): ColorRGB {
     // Best RGB
-    let r = color.x * 1.7552599 + color.y * -0.4836786 + color.z * -0.2530000;
+    let r = color.x * 1.7552599 + color.y * -0.4836786 + color.z * -0.253;
     let g = color.x * -0.5441336 + color.y * 1.5068789 + color.z * 0.0215528;
     let b = color.x * 0.0063467 + color.y * -0.0175761 + color.z * 1.2256959;
-    let rgb = [r,g,b]
+    let rgb = [r, g, b];
     rgb.forEach((color, i) => {
       if (color > 0.0031308) {
         color = 1.055 * Math.pow(color, 1 / 2.4) - 0.055;
-      }
-      else {
+      } else {
         color *= 12.92;
       }
-      rgb[i] = Math.floor(color * 255)
+      rgb[i] = Math.floor(color * 255);
     });
     return { r: rgb[0], g: rgb[1], b: rgb[2] };
   }
