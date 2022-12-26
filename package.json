@@ -5,7 +5,9 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
-    "serve": "vite preview"
+    "serve": "vite preview",
+    "lint": "prettier --check .",
+    "format": "prettier --write ."
   },
   "homepage": "https://outofink.github.io/shades/",
   "devDependencies": {
